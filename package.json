@@ -5,12 +5,28 @@
   "scripts": {
     "start": "electron .",
     "debug": "electron --inspect-brk=9229 .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "author": "",
   "license": "GPL-3.0-or-later",
   "description": "",
   "devDependencies": {
-    "electron": "^30.0.4"
+    "electron": "^30.0.4",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "fr.carru.elecwhat",
+    "mac": {
+      "category": "your.app.category.type"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "tar.xz"
+      ]
+    }
   }
 }
