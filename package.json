@@ -1,5 +1,11 @@
 {
   "name": "elecwhat",
+  "author": {
+    "name": "Pierre Carru",
+    "email": "pierre@carru.fr",
+    "url": "https://github.com/piec"
+  },
+  "homepage": "https://github.com/piec",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
@@ -10,7 +16,6 @@
     "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
-  "author": "",
   "license": "GPL-3.0-or-later",
   "description": "",
   "devDependencies": {
@@ -20,12 +25,12 @@
   "build": {
     "appId": "fr.carru.elecwhat",
     "mac": {
-      "category": "your.app.category.type"
+      "category": "public.app-category.social-networking"
     },
     "linux": {
       "target": [
         "AppImage",
-        "tar.xz"
+        "pacman"
       ]
     }
   }
