@@ -22,8 +22,8 @@ const createWindow = async () => {
   mainWindow.loadURL("https://web.whatsapp.com/");
 
   try {
-    const data = readFileSync("renderer.js", "utf-8");
-    console.log("script=", data);
+    const data = readFileSync(path.join(__dirname, "renderer.js"), "utf-8");
+    console.log(`script=<<${data.split("\n")[0]}>>`);
     await mainWindow.webContents.executeJavaScript(data);
   } catch (err) {
     console.error("executeJavaScript", err);
@@ -55,7 +55,7 @@ const createWindow = async () => {
       mainWindow.show();
     });
 
-    const tray = new Tray("app.png");
+    const tray = new Tray(path.join(__dirname, "app.png"));
     const contextMenu = Menu.buildFromTemplate([
       { label: "Item1", type: "radio" },
       {
