@@ -1,0 +1,16 @@
+{
+  "name": "elecwhat",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "debug": "electron --inspect-brk=9229 .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "description": "",
+  "devDependencies": {
+    "electron": "^30.0.4"
+  }
+}

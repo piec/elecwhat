@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+    http-equiv="Content-Security-Policy"
+     content="default-src 'self'; script-src 'self'; img-src https://web.whatsapp.com https://static.whatsapp.net"; />
+    <title>Hello World!</title>
+    <link data-default-icon="https://static.whatsapp.net/rsrc.php/v3/yP/r/rYZqPCBaG70.png" rel="shortcut icon" href="https://static.whatsapp.net/rsrc.php/v3/yP/r/rYZqPCBaG70.png">
+    <link id="favicon" rel="shortcut icon" type="image/png" href="https://web.whatsapp.com/favicon/1x/f01/" src="/favicon/1x/f01/">
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    We are using Node.js <span id="node-version"></span>, Chromium <span id="chrome-version"></span>, and Electron
+    <span id="electron-version"></span>.
+    <!-- You can also require other files to run in this process -->
+    <button id="notify">notify</button>
+    <button id="hijack">hijack</button>
+    <button id="ping">ping</button>
+    <!-- <script src="./renderer.js"></script> -->
+  </body>
+</html>
