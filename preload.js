@@ -7,5 +7,6 @@ contextBridge.exposeInMainWorld("rpc", {
   ping: () => ipcRenderer.invoke("ping"),
   notify: (args) => ipcRenderer.invoke("notify", args),
   notifyEv: (args) => ipcRenderer.invoke("notifyEv", args),
+  open: (url) => ipcRenderer.invoke("open", url),
   // we can also expose variables, not just functions
 });

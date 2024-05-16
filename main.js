@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session, Menu, MenuItem, Tray, Notification, ipcMain, nativeImage } = require("electron");
+const { app, BrowserWindow, session, Menu, Tray, Notification, ipcMain, nativeImage, shell } = require("electron");
 const { readFileSync } = require("node:fs");
 const path = require("node:path");
 
@@ -11,6 +11,8 @@ const createWindow = async () => {
       preload: path.join(__dirname, "preload.js"),
     },
   });
+
+  // mainWindow.webContents.openDevTools();
 
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     details.requestHeaders["User-Agent"] =
@@ -50,9 +52,13 @@ const createWindow = async () => {
       // console.log("notify", args);
     });
     ipcMain.handle("notifyEv", (ev, argsJson) => {
-      const args = JSON.parse(argsJson);
+      // const args = JSON.parse(argsJson);
       // console.log("notifyEv", args);
       mainWindow.show();
+    });
+    ipcMain.handle("open", (ev, url) => {
+      console.log("url", url);
+      shell.openExternal(url);
     });
 
     const tray = new Tray(path.join(__dirname, "app.png"));
@@ -108,11 +114,7 @@ const createWindow = async () => {
         }
       }
     });
-
-    mainWindow.webContents.openDevTools();
   });
-
-  // Open the DevTools.
 };
 
 // This method will be called when Electron has finished

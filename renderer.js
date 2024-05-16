@@ -1,10 +1,7 @@
-// setTimeout(() => {
 console.log("renderer.js");
-// debugger;
 
-function hijack() {
-  console.log("hijack");
-  window.oldNotification = window.Notification;
+function hijackNotif() {
+  window.realNotification = window.Notification;
 
   const override = {
     construct(target, args) {
@@ -25,7 +22,24 @@ function hijack() {
     },
   };
 
-  window.Notification = new Proxy(window.oldNotification, override);
+  window.Notification = new Proxy(window.realNotification, override);
+}
+
+function hijackClick() {
+  document.body.addEventListener("click", (ev) => {
+    if (!(ev.target instanceof HTMLAnchorElement)) return;
+    if (ev.target.tagName === "A" && ev.target.getAttribute("target") === "_blank") {
+      ev.preventDefault();
+      // ipcRenderer.send("open-link", event.target.href);
+      window?.rpc?.open?.(ev.target.href);
+    }
+  });
+}
+
+function hijack() {
+  console.log("hijack");
+  hijackClick();
+  hijackNotif();
 }
 
 const elmap = {
@@ -54,6 +68,7 @@ for (const name in elmap) {
 
 // document.addEventListener("DOMContentLoaded", () => {
 // console.log("DOMContentLoaded");
+// setTimeout(() => {
 hijack();
+// }, 1000);
 // });
-// }, 2000);
