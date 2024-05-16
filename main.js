@@ -1,6 +1,7 @@
 const { app, BrowserWindow, session, Menu, Tray, Notification, ipcMain, nativeImage, shell } = require("electron");
 const { readFileSync } = require("node:fs");
 const path = require("node:path");
+const { mainDbus } = require("./main-dbus");
 
 const createWindow = async () => {
   // Create the browser window.
@@ -114,6 +115,7 @@ const createWindow = async () => {
         }
       }
     });
+    mainDbus(mainWindow);
   });
 };
 
