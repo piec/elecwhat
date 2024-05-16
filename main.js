@@ -1,4 +1,15 @@
-const { app, BrowserWindow, session, Menu, Tray, Notification, ipcMain, nativeImage, shell } = require("electron");
+const {
+  app,
+  BrowserWindow,
+  session,
+  Menu,
+  Tray,
+  Notification,
+  ipcMain,
+  nativeImage,
+  shell,
+  MenuItem,
+} = require("electron");
 const { readFileSync } = require("node:fs");
 const path = require("node:path");
 const { mainDbus } = require("./main-dbus");
@@ -10,27 +21,46 @@ const createWindow = async () => {
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      spellcheck: true,
     },
   });
+  // Sets the spellchecker to check English US and French
 
   // mainWindow.webContents.openDevTools();
+
+  session.defaultSession.setSpellCheckerLanguages(["en-US", "fr"]);
+
+  mainWindow.webContents.on("context-menu", (event, params) => {
+    const menu = new Menu();
+
+    // Add each spelling suggestion
+    for (const suggestion of params.dictionarySuggestions) {
+      menu.append(
+        new MenuItem({
+          label: suggestion,
+          click: () => mainWindow.webContents.replaceMisspelling(suggestion),
+        })
+      );
+    }
+
+    // Allow users to add the misspelled word to the dictionary
+    if (params.misspelledWord) {
+      menu.append(
+        new MenuItem({
+          label: "Add to dictionary",
+          click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
+        })
+      );
+    }
+
+    menu.popup();
+  });
 
   session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
     details.requestHeaders["User-Agent"] =
       "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
     callback({ cancel: false, requestHeaders: details.requestHeaders });
   });
-
-  // mainWindow.loadFile("index.html");
-  mainWindow.loadURL("https://web.whatsapp.com/");
-
-  try {
-    const data = readFileSync(path.join(__dirname, "renderer.js"), "utf-8");
-    console.log(`script=<<${data.split("\n")[0]}>>`);
-    await mainWindow.webContents.executeJavaScript(data);
-  } catch (err) {
-    console.error("executeJavaScript", err);
-  }
 
   mainWindow.on("close", function (event) {
     console.log(`close ${app.isQuiting}`);
@@ -99,6 +129,17 @@ const createWindow = async () => {
       }
     });
 
+    mainWindow.webContents.on("did-finish-load", async (ev) => {
+      console.log("did-finish-load");
+      try {
+        const data = readFileSync(path.join(__dirname, "renderer.js"), "utf-8");
+        console.log(`script=<<${data.split("\n")[0]}>>`);
+        await mainWindow.webContents.executeJavaScript(data);
+      } catch (err) {
+        console.error("executeJavaScript", err);
+      }
+    });
+
     mainWindow.webContents.on("page-favicon-updated", (ev, favicons) => {
       console.log("favicons", favicons);
       if (favicons.length > 0) {
@@ -115,6 +156,10 @@ const createWindow = async () => {
         }
       }
     });
+
+    // mainWindow.webContents.loadFile("index.html");
+    mainWindow.webContents.loadURL("https://web.whatsapp.com/");
+
     mainDbus(mainWindow);
   });
 };
