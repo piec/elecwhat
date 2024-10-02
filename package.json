@@ -13,7 +13,7 @@
     "debug": "electron --inspect-brk=9229 .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder --linux",
+    "dist": "electron-builder build",
     "postinstall": "electron-builder install-app-deps"
   },
   "license": "GPL-3.0-or-later",
@@ -29,8 +29,7 @@
     },
     "linux": {
       "target": [
-        "AppImage",
-        "pacman"
+        "AppImage"
       ]
     }
   },
