@@ -1,6 +1,9 @@
 name: Build/release
 
-on: push
+on:
+  push:
+    tags:
+      - '*'
 
 jobs:
   release:
@@ -26,6 +29,6 @@ jobs:
 
       - run: npm ci
       # dist
-      - run: npm run dist
+      - run: npm run release
         env:
           GITHUB_TOKEN: ${{ github.token }}
