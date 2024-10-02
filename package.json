@@ -7,7 +7,7 @@
     "url": "https://github.com/piec"
   },
   "homepage": "https://github.com/piec/elecwhat",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -20,10 +20,10 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^31.0.0",
+    "electron": "^32.0.0",
     "electron-builder": "^25.0.5"
   },
   "dependencies": {
-    "dbus-native": "^0.4.0"
+    "@httptoolkit/dbus-native": "^0.1.3"
   }
 }

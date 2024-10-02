@@ -1,5 +1,6 @@
 // https://github.com/sidorares/dbus-native/blob/master/examples/basic-service.js
-const dbus = require("dbus-native");
+// const dbus = require("dbus-native");
+const dbus = require("@httptoolkit/dbus-native");
 
 module.exports.mainDbus = (window) => {
   const serviceName = "fr.carru.elecwhat"; // our DBus service name
