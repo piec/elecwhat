@@ -25,4 +25,7 @@ jobs:
       - run: sudo apt install -y libarchive-tools
 
       - run: npm ci
+      # dist
       - run: npm run dist
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
