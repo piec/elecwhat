@@ -13,7 +13,7 @@
     "debug": "electron --inspect-brk=9229 .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder build",
+    "dist": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
   "license": "GPL-3.0-or-later",
@@ -21,17 +21,6 @@
   "devDependencies": {
     "electron": "^30.0.4",
     "electron-builder": "^24.13.3"
-  },
-  "build": {
-    "appId": "fr.carru.elecwhat",
-    "mac": {
-      "category": "public.app-category.social-networking"
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ]
-    }
   },
   "dependencies": {
     "dbus-native": "^0.4.0"

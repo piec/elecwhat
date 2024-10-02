@@ -1,0 +1,7 @@
+appId: "fr.carru.elecwhat"
+mac:
+  category: "public.app-category.social-networking"
+
+linux:
+  target:
+    - AppImage
