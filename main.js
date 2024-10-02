@@ -94,21 +94,6 @@ const createWindow = async () => {
 
     const tray = new Tray(path.join(__dirname, "app.png"));
     const contextMenu = Menu.buildFromTemplate([
-      { label: "Item1", type: "radio" },
-      {
-        label: "Item2",
-        type: "radio",
-        click: () => {
-          const NOTIFICATION_TITLE = "Basic Notification";
-          const NOTIFICATION_BODY = "Notification from the Main process";
-
-          new Notification({
-            title: NOTIFICATION_TITLE,
-            body: NOTIFICATION_BODY,
-          }).show();
-        },
-      },
-      { label: "Item3", type: "radio", checked: true },
       {
         label: "Quit",
         type: "normal",
@@ -119,7 +104,7 @@ const createWindow = async () => {
         },
       },
     ]);
-    tray.setToolTip("This is my application.");
+    tray.setToolTip("elecwhat");
     tray.setContextMenu(contextMenu);
     tray.on("click", () => {
       if (mainWindow.isVisible()) {
