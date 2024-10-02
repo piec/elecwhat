@@ -1,12 +1,13 @@
 {
   "name": "elecwhat",
+  "description": "",
   "author": {
     "name": "Pierre Carru",
     "email": "pierre@carru.fr",
     "url": "https://github.com/piec"
   },
   "homepage": "https://github.com/piec/elecwhat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -18,10 +19,9 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "license": "GPL-3.0-or-later",
-  "description": "",
   "devDependencies": {
     "electron": "^30.0.4",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^25.0.5"
   },
   "dependencies": {
     "dbus-native": "^0.4.0"
