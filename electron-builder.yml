@@ -3,5 +3,15 @@ mac:
   category: "public.app-category.social-networking"
 
 linux:
+  # https://www.electron.build/app-builder-lib.interface.linuxconfiguration#target
+  # AppImage, flatpak, snap, deb, rpm, freebsd, pacman, p5p, apk, 7z, zip, tar.xz, tar.lz, tar.gz, tar.bz2, dir.
   target:
     - AppImage
+    # - flatpak
+    - pacman
+    - deb
+
+snap:
+  plugs:
+    - default
+    - dbus
