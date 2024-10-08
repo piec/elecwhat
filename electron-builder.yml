@@ -12,6 +12,8 @@ linux:
     - deb
 
 snap:
-  plugs:
-    - default
-    - dbus
+  slots:
+    dbus-svc:
+      interface: dbus
+      bus: session
+      name: "fr.carru.elecwhat"
