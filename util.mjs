@@ -1,4 +1,4 @@
-module.exports.toggleVisibility = function (window) {
+export const toggleVisibility = function (window) {
   console.debug("toggleVisibility");
   const vis = window.isVisible();
   if (vis) {

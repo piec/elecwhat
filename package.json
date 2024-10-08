@@ -8,7 +8,8 @@
   },
   "homepage": "https://github.com/piec/elecwhat",
   "version": "1.0.5",
-  "main": "main.js",
+  "main": "main.mjs",
+  "type": "module",
   "scripts": {
     "start": "electron .",
     "debug": "electron --inspect-brk=9229 .",

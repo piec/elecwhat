@@ -1,9 +1,9 @@
 // https://github.com/sidorares/dbus-native/blob/master/examples/basic-service.js
 // const dbus = require("dbus-native");
-const dbus = require("@httptoolkit/dbus-native");
-const { toggleVisibility } = require("./util");
+import dbus from "@httptoolkit/dbus-native";
+import { toggleVisibility } from "./util.mjs";
 
-module.exports.mainDbus = (window) => {
+export const mainDbus = (window) => {
   const serviceName = "fr.carru.elecwhat"; // our DBus service name
   const interfaceName = serviceName;
   const objectPath = `/${serviceName.replace(/\./g, "/")}`;

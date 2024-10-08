@@ -1,8 +1,8 @@
-const { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem } = require("electron");
-const { readFileSync } = require("node:fs");
-const path = require("node:path");
-const { mainDbus } = require("./main-dbus");
-const { toggleVisibility } = require("./util");
+import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem } from "electron";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { mainDbus } from "./main-dbus.mjs";
+import { toggleVisibility } from "./util.mjs";
 
 const createWindow = async () => {
   // Create the browser window.
@@ -10,7 +10,7 @@ const createWindow = async () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(import.meta.dirname, "preload.js"),
       spellcheck: true,
     },
   });
@@ -82,7 +82,7 @@ const createWindow = async () => {
       shell.openExternal(url);
     });
 
-    const tray = new Tray(path.join(__dirname, "app.png"));
+    const tray = new Tray(path.join(import.meta.dirname, "app.png"));
     const contextMenu = Menu.buildFromTemplate([
       {
         label: "Show/Hide",
@@ -110,7 +110,7 @@ const createWindow = async () => {
     mainWindow.webContents.on("did-finish-load", async (ev) => {
       console.log("did-finish-load");
       try {
-        const data = readFileSync(path.join(__dirname, "renderer.js"), "utf-8");
+        const data = readFileSync(path.join(import.meta.dirname, "renderer.js"), "utf-8");
         console.log(`script=<<${data.split("\n")[0]}>>`);
         await mainWindow.webContents.executeJavaScript(data);
       } catch (err) {
