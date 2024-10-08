@@ -1,18 +1,8 @@
-const {
-  app,
-  BrowserWindow,
-  session,
-  Menu,
-  Tray,
-  Notification,
-  ipcMain,
-  nativeImage,
-  shell,
-  MenuItem,
-} = require("electron");
+const { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem } = require("electron");
 const { readFileSync } = require("node:fs");
 const path = require("node:path");
 const { mainDbus } = require("./main-dbus");
+const { toggleVisibility } = require("./util");
 
 const createWindow = async () => {
   // Create the browser window.
@@ -95,6 +85,13 @@ const createWindow = async () => {
     const tray = new Tray(path.join(__dirname, "app.png"));
     const contextMenu = Menu.buildFromTemplate([
       {
+        label: "Show/Hide",
+        type: "normal",
+        click: () => {
+          toggleVisibility(mainWindow);
+        },
+      },
+      {
         label: "Quit",
         type: "normal",
         click: () => {
@@ -107,11 +104,7 @@ const createWindow = async () => {
     tray.setToolTip("elecwhat");
     tray.setContextMenu(contextMenu);
     tray.on("click", () => {
-      if (mainWindow.isVisible()) {
-        mainWindow.hide();
-      } else {
-        mainWindow.show();
-      }
+      toggleVisibility(mainWindow);
     });
 
     mainWindow.webContents.on("did-finish-load", async (ev) => {
