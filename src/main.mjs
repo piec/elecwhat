@@ -7,6 +7,11 @@ import { factory } from "electron-json-config";
 
 const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
 
+if (config.get("quit-on-close", false)) {
+  console.log("MEH");
+  config.set("show-at-startup", true);
+}
+
 const alreadyRunning = await showIfRunning();
 if (alreadyRunning) {
   console.log("already running");
@@ -63,11 +68,15 @@ if (alreadyRunning) {
     });
 
     mainWindow.on("close", function (event) {
-      console.log(`close ${app.isQuiting}`);
-      if (!app.isQuiting) {
-        event.preventDefault();
-        mainWindow.hide();
-        // event.returnValue = false;
+      if (config.get("quit-on-close", false)) {
+        app.quit();
+      } else {
+        console.log(`close ${app.isQuiting}`);
+        if (!app.isQuiting) {
+          event.preventDefault();
+          mainWindow.hide();
+          // event.returnValue = false;
+        }
       }
     });
 
