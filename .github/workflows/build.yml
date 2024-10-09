@@ -29,6 +29,8 @@ jobs:
           node-version: "22.x"
 
       - run: sudo apt install -y libarchive-tools
+      # - run: sudo snap install snapcraft --classic
+      # - run: sudo snap install multipass --beta --classic
 
       - run: npm ci
       # dist
