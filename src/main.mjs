@@ -10,7 +10,7 @@ const createWindow = async () => {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(import.meta.dirname, "preload.js"),
+      preload: path.join(import.meta.dirname, "..", "src-web", "preload.js"),
       spellcheck: true,
     },
   });
@@ -82,7 +82,7 @@ const createWindow = async () => {
       shell.openExternal(url);
     });
 
-    const tray = new Tray(path.join(import.meta.dirname, "app.png"));
+    const tray = new Tray(path.join(import.meta.dirname, "..", "static", "app.png"));
     const contextMenu = Menu.buildFromTemplate([
       {
         label: "Show/Hide",
@@ -110,7 +110,7 @@ const createWindow = async () => {
     mainWindow.webContents.on("did-finish-load", async (ev) => {
       console.log("did-finish-load");
       try {
-        const data = readFileSync(path.join(import.meta.dirname, "renderer.js"), "utf-8");
+        const data = readFileSync(path.join(import.meta.dirname, "..", "src-web", "renderer.js"), "utf-8");
         console.log(`script=<<${data.split("\n")[0]}>>`);
         await mainWindow.webContents.executeJavaScript(data);
       } catch (err) {
@@ -135,7 +135,7 @@ const createWindow = async () => {
       }
     });
 
-    // mainWindow.webContents.loadFile("index.html");
+    // mainWindow.webContents.loadFile("static/index.html");
     mainWindow.webContents.loadURL("https://web.whatsapp.com/");
 
     mainDbus(mainWindow);

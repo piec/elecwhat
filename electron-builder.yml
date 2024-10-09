@@ -6,10 +6,12 @@ linux:
   # https://www.electron.build/app-builder-lib.interface.linuxconfiguration#target
   # AppImage, flatpak, snap, deb, rpm, freebsd, pacman, p5p, apk, 7z, zip, tar.xz, tar.lz, tar.gz, tar.bz2, dir.
   target:
-    - AppImage
+    # - AppImage
+    # - pacman
+    # - deb
+    - snap
+
     # - flatpak
-    - pacman
-    - deb
 
 snap:
   slots:
