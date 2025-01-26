@@ -154,8 +154,17 @@ if (alreadyRunning) {
         }
       });
 
+      const url = "https://web.whatsapp.com/";
+      mainWindow.webContents.on("did-fail-load", async (ev) => {
+        console.log("did-fail-load");
+        setTimeout(() => {
+          console.log("retry");
+          mainWindow.webContents.loadURL(url);
+        }, config.get("retry-interval", 15000));
+      });
+
       // mainWindow.webContents.loadFile("static/index.html");
-      mainWindow.webContents.loadURL("https://web.whatsapp.com/");
+      mainWindow.webContents.loadURL(url);
 
       mainDbus(mainWindow);
     });
