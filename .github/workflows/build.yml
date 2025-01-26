@@ -29,11 +29,12 @@ jobs:
           node-version: "22.x"
 
       - run: sudo apt install -y libarchive-tools
-      # - run: sudo snap install snapcraft --classic
-      # - run: sudo snap install multipass --beta --classic
+      - run: sudo snap install snapcraft --classic
+      - run: sudo snap install multipass --beta --classic
 
       - run: npm ci
       # dist
       - run: npm run release
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}

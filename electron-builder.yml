@@ -8,7 +8,7 @@ linux:
   target:
     # - AppImage
     # - pacman
-    # - deb
+    #- deb
     - snap
 
     # - flatpak
@@ -17,6 +17,9 @@ publish:
   - github
 
 snap:
+  title: ElecWhat
+  description: |
+    Simple Whatsapp client for linux
   publish:
     - github
   slots:
