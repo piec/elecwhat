@@ -22,7 +22,7 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "electron": "^32.0.0",
-    "electron-builder": "^25.0.5"
+    "electron-builder": "^25.1.8"
   },
   "dependencies": {
     "@httptoolkit/dbus-native": "^0.1.3",
