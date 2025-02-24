@@ -140,7 +140,8 @@ if (alreadyRunning) {
       mainWindow.webContents.on("page-favicon-updated", (ev, favicons) => {
         console.log("favicons", favicons);
         if (favicons.length > 0) {
-          const lastFaviconUrl = favicons[favicons.length - 1];
+          let lastFaviconUrl = favicons[favicons.length - 1];
+          lastFaviconUrl = lastFaviconUrl.replace("/1x/", "/2x/");
           const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
 
           if (lastFaviconUrl && re.test(lastFaviconUrl)) {
