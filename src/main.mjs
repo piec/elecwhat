@@ -2,13 +2,13 @@ import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, M
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { mainDbus, showIfRunning } from "./main-dbus.mjs";
-import { toggleVisibility } from "./util.mjs";
+import { isDebug, toggleVisibility } from "./util.mjs";
 import { factory } from "electron-json-config";
+import { debounce } from "lodash-es";
 
 const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
 
 if (config.get("quit-on-close", false)) {
-  console.log("MEH");
   config.set("show-at-startup", true);
 }
 
@@ -19,25 +19,27 @@ if (alreadyRunning) {
 } else {
   const createWindow = async () => {
     // Create the browser window.
-    //
     const mainWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
       webPreferences: {
         preload: path.join(import.meta.dirname, "..", "src-web", "preload.js"),
         spellcheck: true,
       },
-      show: config.get("show-at-startup", true),
+      show: isDebug || config.get("show-at-startup", true),
+      ...config.get("window-bounds", { width: 1100, height: 800 }),
     });
-    // Sets the spellchecker to check English US and French
 
-    // mainWindow.webContents.openDevTools();
+    if (config.get("open-dev-tools", false)) {
+      mainWindow.webContents.openDevTools();
+    }
 
-    session.defaultSession.setSpellCheckerLanguages(["en-US", "fr"]);
+    // Sets the spellchecker langs
+    const lang = config.get("spellcheck-languages", ["en-US", "fr"]);
+    session.defaultSession.setSpellCheckerLanguages(lang);
 
     mainWindow.webContents.on("context-menu", (event, params) => {
       const menu = new Menu();
 
+      let showmenu = false;
       // Add each spelling suggestion
       for (const suggestion of params.dictionarySuggestions) {
         menu.append(
@@ -46,6 +48,7 @@ if (alreadyRunning) {
             click: () => mainWindow.webContents.replaceMisspelling(suggestion),
           })
         );
+        showmenu = true;
       }
 
       // Allow users to add the misspelled word to the dictionary
@@ -56,16 +59,30 @@ if (alreadyRunning) {
             click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
           })
         );
+        showmenu = true;
       }
 
-      menu.popup();
+      if (showmenu) {
+        menu.popup();
+      }
     });
 
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-      details.requestHeaders["User-Agent"] =
+      const defaultUserAgent =
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
+      details.requestHeaders["User-Agent"] = config.get("user-agent", defaultUserAgent);
       callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
+
+    const windowMovedResized = () => {
+      config.set("window-bounds", mainWindow.getBounds());
+    };
+
+    const debounced = debounce(windowMovedResized, 1000);
+    mainWindow.on("move", debounced);
+    mainWindow.on("resize", debounced);
+    mainWindow.on("close", windowMovedResized);
 
     mainWindow.on("close", function (event) {
       if (config.get("quit-on-close", false)) {
@@ -86,7 +103,9 @@ if (alreadyRunning) {
     });
 
     app.whenReady().then(() => {
-      ipcMain.handle("ping", () => "pong");
+      if (isDebug) {
+        ipcMain.handle("ping", () => "pong");
+      }
       ipcMain.handle("notify", (ev, argsJson) => {
         const args = JSON.parse(argsJson);
         // console.log("notify", args);
@@ -129,7 +148,7 @@ if (alreadyRunning) {
       mainWindow.webContents.on("did-finish-load", async (ev) => {
         console.log("did-finish-load");
         try {
-          const data = readFileSync(path.join(import.meta.dirname, "..", "src-web", "renderer.js"), "utf-8");
+          const data = readFileSync(path.join(import.meta.dirname, "..", "src-web", "injected.js"), "utf-8");
           console.log(`script=<<${data.split("\n")[0]}>>`);
           await mainWindow.webContents.executeJavaScript(data);
         } catch (err) {
@@ -138,7 +157,7 @@ if (alreadyRunning) {
       });
 
       mainWindow.webContents.on("page-favicon-updated", (ev, favicons) => {
-        console.log("favicons", favicons);
+        console.debug("page-favicon-updated");
         if (favicons.length > 0) {
           let lastFaviconUrl = favicons[favicons.length - 1];
           lastFaviconUrl = lastFaviconUrl.replace("/1x/", "/2x/");
@@ -164,8 +183,11 @@ if (alreadyRunning) {
         }, config.get("retry-interval", 15000));
       });
 
-      // mainWindow.webContents.loadFile("static/index.html");
-      mainWindow.webContents.loadURL(url);
+      if (isDebug) {
+        mainWindow.webContents.loadFile("static/debug.html");
+      } else {
+        mainWindow.webContents.loadURL(url);
+      }
 
       mainDbus(mainWindow);
     });

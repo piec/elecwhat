@@ -8,3 +8,5 @@ export const toggleVisibility = function (window) {
   }
   return !vis;
 };
+
+export const isDebug = process?.env?.DEBUG == 1;
