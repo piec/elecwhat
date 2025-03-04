@@ -13,8 +13,8 @@ if (window?.rpc?.debug) {
         console.log("click", ev);
       });
     },
-    hijack: () => {
-      hijack();
+    but1: () => {
+      console.log("but1");
     },
   };
 
