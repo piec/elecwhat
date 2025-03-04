@@ -38,3 +38,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+      - env:
+          BUILDKITE_TOKEN: ${{ secrets.BUILDKITE_TOKEN }}
+        run: |
+          for f in ./dist/*.deb; do
+            curl -s -X POST https://api.buildkite.com/v2/packages/organizations/piec/registries/elecwhat-deb/packages \
+              -H "Authorization: Bearer $BUILDKITE_TOKEN" \
+              -F "file=@$f"
+          done
+
+          for f in ./dist/*.rpm; do
+            curl -X POST https://api.buildkite.com/v2/packages/organizations/piec/registries/elecwhat-rpm/packages \
+              -H "Authorization: Bearer $BUILDKITE_TOKEN" \
+              -F "file=@$f"
+          done
