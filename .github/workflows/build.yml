@@ -49,7 +49,7 @@ jobs:
           done
 
           for f in ./dist/*.rpm; do
-            curl -X POST https://api.buildkite.com/v2/packages/organizations/piec/registries/elecwhat-rpm/packages \
+            curl -s -X POST https://api.buildkite.com/v2/packages/organizations/piec/registries/elecwhat-rpm/packages \
               -H "Authorization: Bearer $BUILDKITE_TOKEN" \
               -F "file=@$f"
           done
