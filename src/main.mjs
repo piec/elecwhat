@@ -1,4 +1,4 @@
-import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem } from "electron";
+import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem, Notification } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { mainDbus, showIfRunning } from "./main-dbus.mjs";
@@ -6,10 +6,26 @@ import { isDebug, toggleVisibility } from "./util.mjs";
 import { factory } from "electron-json-config";
 import { debounce } from "lodash-es";
 
+// config file
 const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
 
+// TODO: change calls to `config.get()` to `state.xxx`
+// also avoids repeating default value
+// allows to change the value without modifying the config
+const state = {
+  notifPrefix: config.get("notification-prefix") ?? "elecwhat - ",
+  showAtStartup: isDebug || config.get("show-at-startup", true),
+  get windowBounds() {
+    const bounds = config.get("window-bounds", { width: 1100, height: 800 });
+    if (isDebug) {
+      bounds.width += 1000;
+    }
+    return bounds;
+  },
+};
+
 if (config.get("quit-on-close", false)) {
-  config.set("show-at-startup", true);
+  state.showAtStartup = true;
 }
 
 const alreadyRunning = await showIfRunning();
@@ -22,13 +38,18 @@ if (alreadyRunning) {
     const mainWindow = new BrowserWindow({
       webPreferences: {
         preload: path.join(import.meta.dirname, "..", "src-web", "preload.js"),
-        spellcheck: true,
+        spellcheck: config.get("spellcheck", true),
       },
-      show: isDebug || config.get("show-at-startup", true),
-      ...config.get("window-bounds", { width: 1100, height: 800 }),
+      show: state.showAtStartup,
+      autoHideMenuBar: config.get("menu-bar-auto-hide", false),
+      ...state.windowBounds,
     });
 
-    if (config.get("open-dev-tools", false)) {
+    if (!config.get("menu-bar", true)) {
+      mainWindow.removeMenu();
+    }
+
+    if (isDebug || config.get("open-dev-tools", false)) {
       mainWindow.webContents.openDevTools();
     }
 
@@ -75,14 +96,16 @@ if (alreadyRunning) {
       callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
 
-    const windowMovedResized = () => {
-      config.set("window-bounds", mainWindow.getBounds());
+    const saveBounds = () => {
+      if (!isDebug) {
+        config.set("window-bounds", mainWindow.getBounds());
+      }
     };
 
-    const debounced = debounce(windowMovedResized, 1000);
+    const debounced = debounce(saveBounds, 1000);
     mainWindow.on("move", debounced);
     mainWindow.on("resize", debounced);
-    mainWindow.on("close", windowMovedResized);
+    mainWindow.on("close", saveBounds);
 
     mainWindow.on("close", function (event) {
       if (config.get("quit-on-close", false)) {
@@ -106,18 +129,16 @@ if (alreadyRunning) {
       if (isDebug) {
         ipcMain.handle("ping", () => "pong");
       }
-      ipcMain.handle("notify", (ev, argsJson) => {
-        const args = JSON.parse(argsJson);
-        // console.log("notify", args);
-      });
       ipcMain.handle("notifyEv", (ev, argsJson) => {
-        // const args = JSON.parse(argsJson);
-        // console.log("notifyEv", args);
         mainWindow.show();
       });
       ipcMain.handle("open", (ev, url) => {
         console.log("url", url);
         shell.openExternal(url);
+      });
+      ipcMain.handle("stateGet", (ev, name) => {
+        console.log("stateGet", name);
+        return state.notifPrefix;
       });
 
       const tray = new Tray(path.join(import.meta.dirname, "..", "static", "app.png"));
@@ -145,14 +166,26 @@ if (alreadyRunning) {
         toggleVisibility(mainWindow);
       });
 
+      const notif = (options) => {
+        const n = new Notification({
+          title: "elecwhat",
+          ...options,
+        });
+        n.show();
+        return n;
+      };
+
       mainWindow.webContents.on("did-finish-load", async (ev) => {
         console.log("did-finish-load");
-        try {
-          const data = readFileSync(path.join(import.meta.dirname, "..", "src-web", "injected.js"), "utf-8");
-          console.log(`script=<<${data.split("\n")[0]}>>`);
-          await mainWindow.webContents.executeJavaScript(data);
-        } catch (err) {
-          console.error("executeJavaScript", err);
+
+        for (const script of ["injected.js"]) {
+          try {
+            const data = readFileSync(path.join(import.meta.dirname, "..", "src-web", script), "utf-8");
+            // console.debug(`script=<<${data.split("\n")[0]}>>`);
+            await mainWindow.webContents.executeJavaScript(data);
+          } catch (err) {
+            console.error("executeJavaScript", err);
+          }
         }
       });
 
@@ -160,6 +193,7 @@ if (alreadyRunning) {
         console.debug("page-favicon-updated");
         if (favicons.length > 0) {
           let lastFaviconUrl = favicons[favicons.length - 1];
+          // larger images
           lastFaviconUrl = lastFaviconUrl.replace("/1x/", "/2x/");
           const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
 
@@ -174,9 +208,15 @@ if (alreadyRunning) {
         }
       });
 
-      const url = "https://web.whatsapp.com/";
+      const url = config.get("url", "https://web.whatsapp.com/");
       mainWindow.webContents.on("did-fail-load", async (ev) => {
         console.log("did-fail-load");
+        notif({
+          body: "Failed to load",
+        }).on("click", () => {
+          mainWindow.show();
+        });
+
         setTimeout(() => {
           console.log("retry");
           mainWindow.webContents.loadURL(url);

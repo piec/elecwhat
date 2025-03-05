@@ -8,7 +8,7 @@ if (window?.ipc?.debug) {
       });
     },
     notify: () => {
-      const n = new Notification("duhhh");
+      const n = new Notification("My notification");
       n.addEventListener("click", (ev, o) => {
         console.log("click", ev);
       });
@@ -25,3 +25,7 @@ if (window?.ipc?.debug) {
     }
   }
 }
+
+addEventListener("keydown", (e) => {
+  console.debug("key", e);
+});

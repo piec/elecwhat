@@ -1,16 +1,11 @@
 console.log("injected.js");
 
-function hijackNotif() {
+function hijackNotif(prefix) {
   window.realNotification = window.Notification;
 
   const override = {
     construct(target, args) {
-      args[0] = `elecwhat - ${args[0]}`;
-      try {
-        window?.ipc?.notify?.(JSON.stringify(args));
-      } catch (err) {
-        console.error(`ipc err: ${err}`);
-      }
+      args[0] = `${prefix}${args[0]}`;
       const thing = new target(...args);
       thing.addEventListener("click", (ev) => {
         console.log("ev", ev);
@@ -34,10 +29,13 @@ function hijackClick() {
   });
 }
 
-function hijack() {
+async function hijack() {
   console.log("hijack");
   hijackClick();
-  hijackNotif();
+
+  const prefix = await window?.ipc?.stateGet?.("notification-prefix");
+  hijackNotif(prefix);
 }
 
-hijack();
+
+void hijack();
