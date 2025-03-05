@@ -7,14 +7,14 @@ function hijackNotif() {
     construct(target, args) {
       args[0] = `elecwhat - ${args[0]}`;
       try {
-        window?.rpc?.notify?.(JSON.stringify(args));
+        window?.ipc?.notify?.(JSON.stringify(args));
       } catch (err) {
-        console.error(`rpc err: ${err}`);
+        console.error(`ipc err: ${err}`);
       }
       const thing = new target(...args);
       thing.addEventListener("click", (ev) => {
         console.log("ev", ev);
-        window?.rpc?.notifyEv?.(JSON.stringify(ev));
+        window?.ipc?.notifyEv?.(JSON.stringify(ev));
       });
 
       return thing;
@@ -29,7 +29,7 @@ function hijackClick() {
     if (!(ev.target instanceof HTMLAnchorElement)) return;
     if (ev.target.tagName === "A" && ev.target.getAttribute("target") === "_blank") {
       ev.preventDefault();
-      window?.rpc?.open?.(ev.target.href);
+      window?.ipc?.open?.(ev.target.href);
     }
   });
 }

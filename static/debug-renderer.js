@@ -1,9 +1,9 @@
 console.log("debug-renderer.js");
 
-if (window?.rpc?.debug) {
+if (window?.ipc?.debug) {
   const elmap = {
     ping: () => {
-      window.rpc.ping().then((ret) => {
+      window.ipc.ping().then((ret) => {
         console.log(`ping -> ${ret}`);
       });
     },
