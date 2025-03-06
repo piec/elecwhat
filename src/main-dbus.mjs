@@ -9,51 +9,6 @@ const interfaceName = serviceName;
 const objectPath = `/${serviceName.replace(/\./g, "/")}`;
 const sessionBus = dbus.sessionBus();
 
-export async function showIfRunning() {
-  console.log("showIfRunning");
-  if (!sessionBus) {
-    console.error("not connected to dbus");
-    return false;
-  }
-
-  const timeout = setTimeout(() => {
-    console.log("dbus show timeout");
-    process.exit();
-  }, 2000);
-
-  const service = sessionBus.getService(serviceName);
-  if (!service) {
-    console.info("!service");
-    return false;
-  }
-
-  let intf;
-  try {
-    intf = await promisify(service.getInterface).bind(service)(objectPath, interfaceName);
-  } catch (err) {
-    console.log("dbus interface not exposed");
-    // console.debug("err", err);
-  }
-
-  if (!intf) {
-    console.info("!intf");
-    clearTimeout(timeout);
-    return false;
-  }
-
-  try {
-    console.log("Show...");
-    await promisify(intf.Show).bind(intf)();
-    console.log("Show ok");
-  } catch (err) {
-    console.log("err", err);
-  }
-  clearTimeout(timeout);
-  sessionBus.disconnect();
-
-  return true;
-}
-
 export const mainDbus = (window) => {
   if (!sessionBus) {
     console.error("not connected to dbus");

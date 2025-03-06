@@ -1,38 +1,35 @@
 import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem, Notification } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { mainDbus, showIfRunning } from "./main-dbus.mjs";
+import { mainDbus } from "./main-dbus.mjs";
 import { isDebug, toggleVisibility } from "./util.mjs";
 import { factory } from "electron-json-config";
 import { debounce } from "lodash-es";
+import pkg from "../package.json" with { type: "json" };
 
-// config file
-const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
+function main() {
+  // config file
+  const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
 
-// TODO: change calls to `config.get()` to `state.xxx`
-// also avoids repeating default value
-// allows to change the value without modifying the config
-const state = {
-  notifPrefix: config.get("notification-prefix") ?? "elecwhat - ",
-  showAtStartup: isDebug || config.get("show-at-startup", true),
-  get windowBounds() {
-    const bounds = config.get("window-bounds", { width: 1100, height: 800 });
-    if (isDebug) {
-      bounds.width += 1000;
-    }
-    return bounds;
-  },
-};
+  // TODO: change calls to `config.get()` to `state.xxx`
+  // also avoids repeating default value
+  // allows to change the value without modifying the config
+  const state = {
+    notifPrefix: config.get("notification-prefix") ?? `${pkg.name} - `,
+    showAtStartup: isDebug || config.get("show-at-startup", true),
+    get windowBounds() {
+      const bounds = config.get("window-bounds", { width: 1100, height: 800 });
+      if (isDebug) {
+        bounds.width += 1000;
+      }
+      return bounds;
+    },
+  };
 
-if (config.get("quit-on-close", false)) {
-  state.showAtStartup = true;
-}
+  if (config.get("quit-on-close", false)) {
+    state.showAtStartup = true;
+  }
 
-const alreadyRunning = await showIfRunning();
-if (alreadyRunning) {
-  console.log("already running");
-  app.quit();
-} else {
   const createWindow = async () => {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
@@ -67,7 +64,7 @@ if (alreadyRunning) {
           new MenuItem({
             label: suggestion,
             click: () => mainWindow.webContents.replaceMisspelling(suggestion),
-          })
+          }),
         );
         showmenu = true;
       }
@@ -78,7 +75,7 @@ if (alreadyRunning) {
           new MenuItem({
             label: "Add to dictionary",
             click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
-          })
+          }),
         );
         showmenu = true;
       }
@@ -160,7 +157,7 @@ if (alreadyRunning) {
           },
         },
       ]);
-      tray.setToolTip("elecwhat");
+      tray.setToolTip(pkg.name);
       tray.setContextMenu(contextMenu);
       tray.on("click", () => {
         toggleVisibility(mainWindow);
@@ -168,7 +165,7 @@ if (alreadyRunning) {
 
       const notif = (options) => {
         const n = new Notification({
-          title: "elecwhat",
+          title: pkg.name,
           ...options,
         });
         n.show();
@@ -217,10 +214,13 @@ if (alreadyRunning) {
           mainWindow.show();
         });
 
-        setTimeout(() => {
-          console.log("retry");
-          mainWindow.webContents.loadURL(url);
-        }, config.get("retry-interval", 15000));
+        setTimeout(
+          () => {
+            console.log("retry");
+            mainWindow.webContents.loadURL(url);
+          },
+          config.get("retry-interval", 15000),
+        );
       });
 
       if (isDebug) {
@@ -229,21 +229,36 @@ if (alreadyRunning) {
         mainWindow.webContents.loadURL(url);
       }
 
-      mainDbus(mainWindow);
+      if (config.get("dbus", true)) {
+        mainDbus(mainWindow);
+      }
     });
-  };
 
+    return mainWindow;
+  };
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.whenReady().then(() => {
-    createWindow();
+  app.whenReady().then(async () => {
+    let window = await createWindow();
 
-    app.on("activate", () => {
+    app.on("activate", async () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
+        window = await createWindow();
+      }
+    });
+
+    app.on("second-instance", (event, commandLine, workingDirectory, additionalData) => {
+      console.log("second-instance", additionalData, commandLine);
+
+      // Someone tried to run a second instance, we should focus our window.
+      if (window) {
+        if (window.isMinimized()) {
+          window.restore();
+        }
+        window.show();
       }
     });
   });
@@ -255,7 +270,13 @@ if (alreadyRunning) {
     console.log("window-all-closed");
     if (process.platform !== "darwin") app.quit();
   });
+}
 
-  // In this file you can include the rest of your app's specific main process
-  // code. You can also put them in separate files and require them here.
+const gotTheLock = app.requestSingleInstanceLock({ name: pkg.name });
+
+if (!gotTheLock) {
+  console.log("already running, raised the main window");
+  app.quit();
+} else {
+  main();
 }
