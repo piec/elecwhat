@@ -2,7 +2,6 @@
 // const dbus = require("dbus-native");
 import dbus from "@httptoolkit/dbus-native";
 import { toggleVisibility } from "./util.mjs";
-import { promisify } from "util";
 
 const serviceName = "fr.carru.elecwhat"; // our DBus service name
 const interfaceName = serviceName;
@@ -23,18 +22,18 @@ export const mainDbus = (window) => {
   sessionBus.requestName(serviceName, 0x4, (err, retCode) => {
     // If there was an error, warn user and fail
     if (err) {
-      throw new Error(`Could not request service name ${serviceName}, the error was: ${err}.`);
+      console.error(`dbus: could not request service name "${serviceName}", error: ${err}`);
     }
 
     // Return code 0x1 means we successfully had the name
     if (retCode === 1) {
-      console.log(`Successfully requested service name "${serviceName}"!`);
+      console.log(`dbus: successfully requested service name "${serviceName}"`);
       proceed();
     } else {
       // Other return codes means various errors, check here
       // (https://dbus.freedesktop.org/doc/api/html/group__DBusShared.html#ga37a9bc7c6eb11d212bf8d5e5ff3b50f9) for more
       // information
-      throw new Error(`Failed to request service name "${serviceName}". Check what return code "${retCode}" means.`);
+      console.error(`dbus: failed to request service name "${serviceName}", code="${retCode}"`);
     }
   });
 
@@ -69,6 +68,6 @@ export const mainDbus = (window) => {
     sessionBus.exportInterface(iface, objectPath, ifaceDesc);
 
     // Say our service is ready to receive function calls (you can use `gdbus call` to make function calls)
-    console.log("Interface exposed to DBus, ready to receive function calls!");
+    console.log("dbus: ready");
   }
 };
