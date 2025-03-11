@@ -175,7 +175,7 @@ function main() {
       mainWindow.webContents.on("did-finish-load", async (ev) => {
         console.log("did-finish-load");
 
-        for (const script of ["injected.js"]) {
+        for (const script of ["injected.js", "injected-edit.js"]) {
           try {
             const data = readFileSync(path.join(import.meta.dirname, "..", "src-web", script), "utf-8");
             // console.debug(`script=<<${data.split("\n")[0]}>>`);

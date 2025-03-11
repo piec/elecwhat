@@ -83,6 +83,15 @@ const addedKeys = [
       importDefault("WAWebKeyboardRun")("TOGGLE_UNREAD");
     },
   },
+  {
+    key: "ArrowUp",
+    ctrlKey: true,
+    shiftKey: false,
+    altKey: false,
+    handler: () => {
+      myedit();
+    },
+  },
 ];
 
 addEventListener("keydown", (e) => {
