@@ -2,7 +2,7 @@ import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, M
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { mainDbus } from "./main-dbus.mjs";
-import { isDebug, toggleVisibility } from "./util.mjs";
+import { addAboutMenuItem, isDebug, toggleVisibility } from "./util.mjs";
 import { factory } from "electron-json-config";
 import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
@@ -236,12 +236,22 @@ function main() {
 
     return mainWindow;
   };
+
+  app.setAboutPanelOptions({
+    applicationName: pkg.name,
+    applicationVersion: app.getVersion(),
+    authors: [pkg?.author?.name],
+    website: pkg?.homepage,
+    iconPath: "static/app.png",
+    copyright: pkg?.license,
+  });
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(async () => {
     let window = await createWindow();
 
+    addAboutMenuItem();
     app.on("activate", async () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
