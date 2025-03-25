@@ -7,6 +7,27 @@ import { factory } from "electron-json-config";
 import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
 
+const defaultKeys = {
+  "A ArrowDown": {
+    whatsappAction: "GO_TO_NEXT_CHAT",
+  },
+  "A ArrowUp": {
+    whatsappAction: "GO_TO_PREV_CHAT",
+  },
+  "C Tab": {
+    whatsappAction: "GO_TO_NEXT_CHAT",
+  },
+  "CS Tab": {
+    whatsappAction: "GO_TO_PREV_CHAT",
+  },
+  "C u": {
+    whatsappAction: "TOGGLE_UNREAD",
+  },
+  "C ArrowUp": {
+    action: "EDIT_LAST_MESSAGE",
+  },
+};
+
 function main() {
   // config file
   const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
@@ -23,6 +44,9 @@ function main() {
         bounds.width += 1000;
       }
       return bounds;
+    },
+    get keys() {
+      return { ...defaultKeys, ...config.get("keys", {}) };
     },
   };
 
@@ -135,7 +159,7 @@ function main() {
       });
       ipcMain.handle("stateGet", (ev, name) => {
         console.log("stateGet", name);
-        return state.notifPrefix;
+        return state[name];
       });
 
       const tray = new Tray(path.join(import.meta.dirname, "..", "static", "app.png"));

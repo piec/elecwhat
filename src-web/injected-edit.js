@@ -2,7 +2,7 @@ console.log("injected-edit.js");
 
 // I did not find a way to trigger edit by code
 // do it by simulating clicks :o
-const myedit = () => {
+const ewEditLastMessage = () => {
   const rows = document.querySelectorAll("[role=row]");
   const row = rows[rows.length - 1];
   const e = row.querySelector(".message-out > div");
