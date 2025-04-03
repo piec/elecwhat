@@ -32,9 +32,6 @@ function main() {
   // config file
   const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
 
-  // TODO: change calls to `config.get()` to `state.xxx`
-  // also avoids repeating default value
-  // allows to change the value without modifying the config
   const state = {
     notifPrefix: config.get("notification-prefix") ?? `${pkg.name} - `,
     showAtStartup: isDebug || config.get("show-at-startup", true),
@@ -62,7 +59,7 @@ function main() {
         spellcheck: config.get("spellcheck", true),
       },
       show: state.showAtStartup,
-      autoHideMenuBar: config.get("menu-bar-auto-hide", false),
+      autoHideMenuBar: config.get("menu-bar-auto-hide", true),
       ...state.windowBounds,
     });
 
