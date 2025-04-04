@@ -284,12 +284,28 @@ function main() {
     app.on("second-instance", (event, commandLine, workingDirectory, additionalData) => {
       console.log("second-instance", additionalData, commandLine);
 
-      // Someone tried to run a second instance, we should focus our window.
-      if (window) {
+      const show = () => {
         if (window.isMinimized()) {
           window.restore();
         }
         window.show();
+      };
+
+      if (window) {
+        if (commandLine.includes("--hide")) {
+          window.hide();
+        } else if (commandLine.includes("--toggle")) {
+          if (window.isVisible()) {
+            window.hide();
+          } else {
+            show();
+          }
+        } else if (commandLine.includes("--quit")) {
+          app.quit();
+        } else {
+          // --show
+          show();
+        }
       }
     });
   });
