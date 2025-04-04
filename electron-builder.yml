@@ -11,6 +11,7 @@ linux:
     - deb
     - snap
     - rpm
+    - tar.xz
 
     # - flatpak
 
