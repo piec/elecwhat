@@ -21,3 +21,10 @@ export const addAboutMenuItem = () => {
   const helpMenu = menu.items.slice(-1)[0];
   helpMenu?.submenu.append(new MenuItem({ role: "about" }));
 };
+
+export function windowShow(window) {
+  if (window.isMinimized()) {
+    window.restore();
+  }
+  window.show();
+}

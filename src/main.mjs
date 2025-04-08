@@ -1,11 +1,11 @@
 import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem, Notification } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { mainDbus } from "./main-dbus.mjs";
-import { addAboutMenuItem, isDebug, toggleVisibility } from "./util.mjs";
+import { addAboutMenuItem, isDebug, toggleVisibility, windowShow } from "./util.mjs";
 import { factory } from "electron-json-config";
 import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
+import * as os from "os";
 
 const defaultKeys = {
   "A ArrowDown": {
@@ -148,7 +148,7 @@ function main() {
         ipcMain.handle("ping", () => "pong");
       }
       ipcMain.handle("notifyEv", (ev, argsJson) => {
-        mainWindow.show();
+        windowShow(mainWindow);
       });
       ipcMain.handle("open", (ev, url) => {
         console.log("url", url);
@@ -232,7 +232,7 @@ function main() {
         notif({
           body: "Failed to load",
         }).on("click", () => {
-          mainWindow.show();
+          windowShow(mainWindow);
         });
 
         setTimeout(
@@ -250,8 +250,16 @@ function main() {
         mainWindow.webContents.loadURL(url);
       }
 
-      if (config.get("dbus", true)) {
-        mainDbus(mainWindow);
+      if (os.platform == "linux") {
+        if (config.get("dbus", true)) {
+          import("./main-dbus.mjs")
+            .then((dbus) => {
+              dbus.mainDbus(mainWindow);
+            })
+            .catch((err) => {
+              console.error("dbus", err);
+            });
+        }
       }
     });
 
@@ -263,7 +271,7 @@ function main() {
     applicationVersion: app.getVersion(),
     authors: [pkg?.author?.name],
     website: pkg?.homepage,
-    iconPath: "static/app.png",
+    // iconPath: "static/app.png", does not work when packaged
     copyright: pkg?.license,
   });
   // This method will be called when Electron has finished
@@ -284,13 +292,6 @@ function main() {
     app.on("second-instance", (event, commandLine, workingDirectory, additionalData) => {
       console.log("second-instance", additionalData, commandLine);
 
-      const show = () => {
-        if (window.isMinimized()) {
-          window.restore();
-        }
-        window.show();
-      };
-
       if (window) {
         if (commandLine.includes("--hide")) {
           window.hide();
@@ -298,13 +299,13 @@ function main() {
           if (window.isVisible()) {
             window.hide();
           } else {
-            show();
+            windowShow(window);
           }
         } else if (commandLine.includes("--quit")) {
           app.quit();
         } else {
           // --show
-          show();
+          windowShow(window);
         }
       }
     });

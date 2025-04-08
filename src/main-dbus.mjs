@@ -1,7 +1,8 @@
 // https://github.com/sidorares/dbus-native/blob/master/examples/basic-service.js
 // const dbus = require("dbus-native");
 import dbus from "@httptoolkit/dbus-native";
-import { toggleVisibility } from "./util.mjs";
+import { toggleVisibility, windowShow } from "./util.mjs";
+import { app } from "electron";
 
 const serviceName = "fr.carru.elecwhat"; // our DBus service name
 const interfaceName = serviceName;
@@ -46,12 +47,13 @@ export const mainDbus = (window) => {
         Hide: ["", ""],
         ToggleVisibility: ["", "b"],
         Visible: ["", "b"],
+        Quit: ["", ""],
       },
     };
 
     const iface = {
       Show: function () {
-        window.show();
+        windowShow(window);
       },
       Hide: function () {
         window.hide();
@@ -61,6 +63,9 @@ export const mainDbus = (window) => {
       },
       ToggleVisibility: function () {
         return toggleVisibility(window);
+      },
+      Quit: function () {
+        app.quit();
       },
     };
 
