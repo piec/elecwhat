@@ -9,7 +9,10 @@ const ewEditLastMessage = () => {
   e.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 
   setTimeout(() => {
-    row.querySelector("span[data-icon=ic-chevron-down-menu]").click();
+    let but = row.querySelector("span[data-icon=down-context]");
+    but ??= row.querySelector("span[data-icon=ic-chevron-down-menu]");
+
+    but.click();
     e.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }));
   }, 100);
 
