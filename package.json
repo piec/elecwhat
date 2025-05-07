@@ -21,7 +21,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^34.2.0",
+    "electron": "^36.1.0",
     "electron-builder": "^25.1.8",
     "prettier": "^3.5.3"
   },
