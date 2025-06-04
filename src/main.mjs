@@ -1,7 +1,7 @@
 import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem, Notification } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { addAboutMenuItem, isDebug, toggleVisibility, windowShow } from "./util.mjs";
+import { addAboutMenuItem, isDebug, toggleVisibility, windowShow, getUrl, loadUrl } from "./util.mjs";
 import { factory } from "electron-json-config";
 import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
@@ -203,6 +203,23 @@ function main() {
             await mainWindow.webContents.executeJavaScript(data);
           } catch (err) {
             console.error("executeJavaScript", err);
+          }
+        }
+        for (const css of config.get("css", [])) {
+          try {
+            let url = getUrl(css);
+            let data = null;
+            if (url) {
+              data = await loadUrl(url);
+            } else {
+              data = css;
+            }
+
+            if (data) {
+              mainWindow.webContents.insertCSS(data);
+            }
+          } catch (err) {
+            console.error(`error inserting ${css}`, err);
           }
         }
       });

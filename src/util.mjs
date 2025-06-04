@@ -1,4 +1,5 @@
-import { Menu, MenuItem } from "electron";
+import { Menu, MenuItem, app, net } from "electron";
+import { readFileSync } from "node:fs";
 
 export const toggleVisibility = function (window) {
   console.debug("toggleVisibility");
@@ -27,4 +28,35 @@ export function windowShow(window) {
     window.restore();
   }
   window.show();
+}
+
+export async function loadUrl(url) {
+  let data = null;
+  if (url.protocol == "file:") {
+    let path = url.pathname;
+    if (url.hostname == "~") {
+      path = app.getPath("home") + path;
+    }
+    console.log("load from file", path);
+    data = readFileSync(path, "utf-8");
+  } else if (url.protocol == "https:") {
+    console.log("load from", url.href);
+    const res = await net.fetch(url.href);
+    if (res.ok) {
+      data = await res.text();
+    } else {
+      console.error("fetch", res.status, res.statusText);
+    }
+  } else {
+    console.error("unsupported protocol", url.protocol);
+  }
+  return data;
+}
+
+export function getUrl(url) {
+  try {
+    return new URL(url);
+  } catch (err) {
+    return null;
+  }
 }

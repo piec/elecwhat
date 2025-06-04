@@ -4,6 +4,7 @@
 * Desktop notifications
 * Tray icon with unread count (aka AppIndicator)
 * Custom keyboard shortcuts ([default](https://github.com/piec/elecwhat/blob/5128cfa83dc8b2a54084e39df35e9d6a2a1317ce/src/main.mjs#L10-L29))
+* Custom CSS
 * Spellcheck
 * CLI & D-Bus interface to show/hide/toggle window
 * Very stable, I have been running it for 6+ month without crash/freeze
@@ -65,6 +66,12 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
       "whatsappAction": "GO_TO_NEXT_CHAT"
     }
   },
+
+  "css": [
+    "span { font-size: small !important; }",
+    "https://gist.githubusercontent.com/piec/3f9a198a7694f1df37895ee3faee9b6e/raw/whatsapp-test.css",
+    "file://~/mysheet.css"
+  ],
 
   "spellcheck": true,
   "spellcheck-languages": ["en-US", "fr"],
