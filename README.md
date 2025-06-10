@@ -31,7 +31,6 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
 * [AUR package]: `yay -S elecwhat-bin`
 * **or** Pacman package in [Releases]
 * **or** AppImage in [Releases]
-* (planned: **or** AUR package)
 
 ### Debian:
 * [Buildkite deb]
@@ -91,4 +90,4 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
 [Releases]: https://github.com/piec/elecwhat/releases
 [AppIndicator]: https://extensions.gnome.org/extension/615/appindicator-support/
 [issue]: https://github.com/electron/electron/issues/41066
-[AUR package]:(https://aur.archlinux.org/packages/elecwhat-bin)
+[AUR package]: https://aur.archlinux.org/packages/elecwhat-bin
