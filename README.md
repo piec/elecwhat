@@ -73,7 +73,7 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
   ],
 
   "spellcheck": true,
-  "spellcheck-languages": ["en-US", "fr"],
+  "spellcheck-languages": ["en-US", "fr", "es-ES"],
 
   "user-agent": "...",
   "open-dev-tools": false
