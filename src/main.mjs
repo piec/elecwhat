@@ -72,7 +72,7 @@ function main() {
     }
 
     // Sets the spellchecker langs
-    const lang = config.get("spellcheck-languages", ["en-US", "fr"]);
+    const lang = config.get("spellcheck-languages", ["en-US", "fr", "es-ES"]);
     session.defaultSession.setSpellCheckerLanguages(lang);
 
     mainWindow.webContents.on("context-menu", (event, params) => {
