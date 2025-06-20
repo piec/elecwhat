@@ -52,7 +52,13 @@ function main() {
   }
 
   const createWindow = async () => {
-    // Create the browser window.
+    // Detect preferred system languages
+    const preferredLanguages = app.getPreferredSystemLanguages();
+    console.log("Preferred system languages:", preferredLanguages);
+
+    // Configure the spellchecker with detected languages
+    session.defaultSession.setSpellCheckerLanguages(preferredLanguages);
+
     const mainWindow = new BrowserWindow({
       webPreferences: {
         preload: path.join(import.meta.dirname, "..", "src-web", "preload.js"),
@@ -71,9 +77,10 @@ function main() {
       mainWindow.webContents.openDevTools();
     }
 
-    // Sets the spellchecker langs
-    const lang = config.get("spellcheck-languages", ["en-US", "fr", "es-ES"]);
-    session.defaultSession.setSpellCheckerLanguages(lang);
+    // Sets the spellchecker langs (fallback if preferredLanguages is empty)
+    const fallbackLangs = config.get("spellcheck-languages", ["en-US", "fr", "es-ES"]);
+    const spellcheckLangs = preferredLanguages.length > 0 ? preferredLanguages : fallbackLangs;
+    session.defaultSession.setSpellCheckerLanguages(spellcheckLangs);
 
     mainWindow.webContents.on("context-menu", (event, params) => {
       const menu = new Menu();
