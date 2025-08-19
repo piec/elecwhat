@@ -39,14 +39,18 @@ const defaultKeys = {
 };
 
 function main() {
-  // config file
   const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
+  console.log("config file", config.file);
+
+  const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
+  const persistState = factory(persistStateFileName, "state", { prettyJson: { enabled: true } });
+  console.log("state file", persistState.file);
 
   const state = {
     notifPrefix: config.get("notification-prefix") ?? `${pkg.name} - `,
     showAtStartup: isDebug || config.get("show-at-startup", true),
     get windowBounds() {
-      const bounds = config.get("window-bounds", { width: 1100, height: 800 });
+      const bounds = persistState.get("window-bounds", { width: 1099, height: 800 });
       if (isDebug) {
         bounds.width += 1000;
       }
@@ -104,7 +108,7 @@ function main() {
 
     const saveBounds = () => {
       if (!isDebug) {
-        config.set("window-bounds", mainWindow.getBounds());
+        persistState.set("window-bounds", mainWindow.getBounds());
       }
     };
 
