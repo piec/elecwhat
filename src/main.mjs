@@ -72,8 +72,17 @@ function main() {
     }
 
     // Sets the spellchecker langs
-    const lang = config.get("spellcheck-languages", ["en-US", "fr"]);
-    session.defaultSession.setSpellCheckerLanguages(lang);
+    const locale = app.getLocale();
+    console.log("locale", locale);
+    const defaultSpellLang = app.getLocale() || "en-US";
+    console.log("defaultSpellLang", defaultSpellLang);
+    const spellLang = config.get("spellcheck-languages", [defaultSpellLang]);
+    console.log("spellLang", spellLang);
+    try {
+      session.defaultSession.setSpellCheckerLanguages(spellLang);
+    } catch (err) {
+      console.error("setSpellCheckerLanguages", err);
+    }
 
     mainWindow.webContents.on("context-menu", (event, params) => {
       const menu = new Menu();
