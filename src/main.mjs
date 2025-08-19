@@ -3,9 +3,19 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { addAboutMenuItem, isDebug, toggleVisibility, windowShow, getUrl, loadUrl } from "./util.mjs";
 import { factory } from "electron-json-config";
+import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
+
 import pkg from "../package.json" with { type: "json" };
 import * as os from "os";
+
+contextMenu({
+  showSelectAll: false,
+  showSaveImageAs: true,
+  showSaveVideoAs: true,
+  showSearchWithGoogle: false,
+  showInspectElement: isDebug,
+});
 
 const defaultKeys = {
   "A ArrowDown": {
@@ -83,37 +93,6 @@ function main() {
     } catch (err) {
       console.error("setSpellCheckerLanguages", err);
     }
-
-    mainWindow.webContents.on("context-menu", (event, params) => {
-      const menu = new Menu();
-
-      let showmenu = false;
-      // Add each spelling suggestion
-      for (const suggestion of params.dictionarySuggestions) {
-        menu.append(
-          new MenuItem({
-            label: suggestion,
-            click: () => mainWindow.webContents.replaceMisspelling(suggestion),
-          }),
-        );
-        showmenu = true;
-      }
-
-      // Allow users to add the misspelled word to the dictionary
-      if (params.misspelledWord) {
-        menu.append(
-          new MenuItem({
-            label: "Add to dictionary",
-            click: () => mainWindow.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord),
-          }),
-        );
-        showmenu = true;
-      }
-
-      if (showmenu) {
-        menu.popup();
-      }
-    });
 
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
       const defaultUserAgent =
