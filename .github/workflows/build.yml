@@ -29,6 +29,7 @@ jobs:
           node-version: "22.x"
 
       - run: sudo apt install -y libarchive-tools
+      - run: sudo apt install -y flatpak flatpak-builder
       - run: sudo snap install snapcraft --classic
       - run: sudo snap install multipass --beta --classic
 

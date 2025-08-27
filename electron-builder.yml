@@ -12,6 +12,7 @@ linux:
     - snap
     - rpm
     - tar.xz
+    - flatpak
 
     # - flatpak
 
