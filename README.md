@@ -76,7 +76,12 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
   "spellcheck-languages": ["en-US", "fr"],
 
   "user-agent": "...",
-  "open-dev-tools": false
+  "open-dev-tools": false,
+
+  "scripts": [
+    # ~/.config/elecwhat/user-scripts/myscript.js
+    "${userData}/user-scripts/myscripts.js"
+  ]
 }
 ```
 

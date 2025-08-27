@@ -30,8 +30,12 @@ export function windowShow(window) {
   window.show();
 }
 
-export async function loadUrl(url) {
+export async function loadUrl(url, protocols = ["file:", "https:"]) {
   let data = null;
+  if (!protocols.includes(url.protocol)) {
+    console.error("unsupported protocol", url.protocol);
+    return null;
+  }
   if (url.protocol == "file:") {
     let path = url.pathname;
     if (url.hostname == "~") {
@@ -47,8 +51,6 @@ export async function loadUrl(url) {
     } else {
       console.error("fetch", res.status, res.statusText);
     }
-  } else {
-    console.error("unsupported protocol", url.protocol);
   }
   return data;
 }
@@ -59,4 +61,8 @@ export function getUrl(url) {
   } catch (err) {
     return null;
   }
+}
+
+export function replaceVariables(script) {
+  return script.replace("${userData}", app.getPath("userData"));
 }

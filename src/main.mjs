@@ -1,7 +1,7 @@
-import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, MenuItem, Notification } from "electron";
+import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, Notification } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { addAboutMenuItem, isDebug, toggleVisibility, windowShow, getUrl, loadUrl } from "./util.mjs";
+import { addAboutMenuItem, isDebug, toggleVisibility, windowShow, getUrl, loadUrl, replaceVariables } from "./util.mjs";
 import { factory } from "electron-json-config";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -185,16 +185,41 @@ function main() {
         return n;
       };
 
+      async function executeScript(data) {
+        try {
+          await mainWindow.webContents.executeJavaScript(data);
+        } catch (err) {
+          console.error("executeJavaScript", err);
+        }
+      }
       mainWindow.webContents.on("did-finish-load", async (ev) => {
         console.log("did-finish-load");
+        // builtin scripts
+        const scripts = ["injected.js", "injected-edit.js"];
+        console.log("load scripts", scripts);
+        for (const script of scripts) {
+          const filename = path.join(import.meta.dirname, "..", "src-web", script);
+          const data = readFileSync(filename, "utf-8");
+          await executeScript(data);
+        }
 
-        for (const script of ["injected.js", "injected-edit.js"]) {
-          try {
-            const data = readFileSync(path.join(import.meta.dirname, "..", "src-web", script), "utf-8");
-            // console.debug(`script=<<${data.split("\n")[0]}>>`);
-            await mainWindow.webContents.executeJavaScript(data);
-          } catch (err) {
-            console.error("executeJavaScript", err);
+        // user scripts
+        const userScriptsPath = path.resolve(path.join(app.getPath("userData"), "user-scripts"));
+        for (let filename of config.get("scripts", [])) {
+          filename = replaceVariables(filename);
+          filename = path.resolve(filename);
+          console.log("load user script", filename);
+          if (!filename.startsWith(userScriptsPath)) {
+            console.error(`script must be in ${userScriptsPath}:`, filename);
+            continue;
+          }
+          if (!filename.endsWith(".js")) {
+            console.error("script must end with .js", filename);
+            continue;
+          }
+          const data = readFileSync(filename, "utf-8");
+          if (data) {
+            await executeScript(data);
           }
         }
         for (const css of config.get("css", [])) {
