@@ -1,7 +1,16 @@
-import { app, BrowserWindow, session, Menu, Tray, ipcMain, nativeImage, shell, Notification } from "electron";
+import { app, BrowserWindow, session, Menu, Tray, ipcMain, shell, Notification } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { addAboutMenuItem, isDebug, toggleVisibility, windowShow, getUrl, loadUrl, replaceVariables } from "./util.mjs";
+import {
+  addAboutMenuItem,
+  isDebug,
+  toggleVisibility,
+  windowShow,
+  getUrl,
+  loadUrl,
+  replaceVariables,
+  getIcon,
+} from "./util.mjs";
 import { factory } from "electron-json-config";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -242,27 +251,13 @@ function main() {
         }
       });
 
-      mainWindow.webContents.on("page-favicon-updated", (ev, favicons) => {
+      mainWindow.webContents.on("page-favicon-updated", async (ev, favicons) => {
         console.debug("page-favicon-updated");
         if (favicons.length > 0) {
-          let lastFaviconUrl = favicons[favicons.length - 1];
-          // larger images
-          lastFaviconUrl = lastFaviconUrl.replace("/1x/", "/2x/");
-          const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
-
-          if (lastFaviconUrl && re.test(lastFaviconUrl)) {
-            fetch(lastFaviconUrl, {
-              headers: { "User-Agent": userAgent },
-            }).then((r) => {
-              if (!r.ok) {
-                console.error("fetch", r.status, r.statusText);
-                return;
-              }
-              r.arrayBuffer().then((ab) => {
-                const img = nativeImage.createFromBuffer(Buffer.from(ab));
-                tray.setImage(img);
-              });
-            });
+          const lastFaviconUrl = favicons[favicons.length - 1];
+          const img = await getIcon(lastFaviconUrl, userAgent);
+          if (img) {
+            tray.setImage(img);
           }
         }
       });

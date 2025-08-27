@@ -1,5 +1,6 @@
-import { Menu, MenuItem, app, net } from "electron";
+import { Menu, MenuItem, app, nativeImage, net } from "electron";
 import { readFileSync } from "node:fs";
+import path from "node:path";
 
 export const toggleVisibility = function (window) {
   console.debug("toggleVisibility");
@@ -65,4 +66,24 @@ export function getUrl(url) {
 
 export function replaceVariables(script) {
   return script.replace("${userData}", app.getPath("userData"));
+}
+
+export async function getIcon(url, userAgent) {
+  const lastPathPart = path.basename(url);
+  console.debug("favicon", url, lastPathPart);
+  // larger images
+  url = url.replace("/1x/", "/2x/");
+  const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
+
+  if (url && re.test(url)) {
+    const r = await fetch(url, {
+      headers: { "User-Agent": userAgent },
+    });
+    if (!r.ok) {
+      console.error("fetch", r.status, r.statusText);
+      return null;
+    }
+    const ab = await r.arrayBuffer();
+    return nativeImage.createFromBuffer(Buffer.from(ab));
+  }
 }
