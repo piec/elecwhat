@@ -38,9 +38,13 @@ const defaultKeys = {
   },
 };
 
+const defaultUserAgent =
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
 function main() {
   const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
   console.log("config file", config.file);
+  const userAgent = config.get("user-agent", defaultUserAgent);
 
   const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
   const persistState = factory(persistStateFileName, "state", { prettyJson: { enabled: true } });
@@ -99,10 +103,7 @@ function main() {
     }
 
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-      const defaultUserAgent =
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
-
-      details.requestHeaders["User-Agent"] = config.get("user-agent", defaultUserAgent);
+      details.requestHeaders["User-Agent"] = userAgent;
       callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
 
@@ -250,7 +251,13 @@ function main() {
           const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
 
           if (lastFaviconUrl && re.test(lastFaviconUrl)) {
-            fetch(lastFaviconUrl).then((r) => {
+            fetch(lastFaviconUrl, {
+              headers: { "User-Agent": userAgent },
+            }).then((r) => {
+              if (!r.ok) {
+                console.error("fetch", r.status, r.statusText);
+                return;
+              }
               r.arrayBuffer().then((ab) => {
                 const img = nativeImage.createFromBuffer(Buffer.from(ab));
                 tray.setImage(img);
