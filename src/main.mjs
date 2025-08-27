@@ -53,7 +53,6 @@ const defaultUserAgent =
 function main() {
   const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
   console.log("config file", config.file);
-  const userAgent = config.get("user-agent", defaultUserAgent);
 
   const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
   const persistState = factory(persistStateFileName, "state", { prettyJson: { enabled: true } });
@@ -71,6 +70,12 @@ function main() {
     },
     get keys() {
       return { ...defaultKeys, ...config.get("keys", {}) };
+    },
+    get userAgent() {
+      return config.get("user-agent", defaultUserAgent);
+    },
+    get iconsDir() {
+      return config.get("icons-directory", path.join(app.getPath("userData"), "user-icons"));
     },
   };
 
@@ -112,7 +117,7 @@ function main() {
     }
 
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-      details.requestHeaders["User-Agent"] = userAgent;
+      details.requestHeaders["User-Agent"] = state.userAgent;
       callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
 
@@ -251,12 +256,15 @@ function main() {
         }
       });
 
+      let newestIcon = null;
       mainWindow.webContents.on("page-favicon-updated", async (ev, favicons) => {
-        console.debug("page-favicon-updated");
         if (favicons.length > 0) {
           const lastFaviconUrl = favicons[favicons.length - 1];
-          const img = await getIcon(lastFaviconUrl, userAgent);
-          if (img) {
+          newestIcon = lastFaviconUrl;
+          const img = await getIcon(lastFaviconUrl, state);
+          // test that the icon corresponds to the last emitted event
+          // sometimes an old icon takes time to download and arrives late
+          if (img && lastFaviconUrl === newestIcon) {
             tray.setImage(img);
           }
         }

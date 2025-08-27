@@ -12,6 +12,8 @@
   * Code easy to review - <600 lines of code currently
   * Automatically built by GitHub Actions (CI)
 * Preserve window position
+* Custom user scripts in `~/.config/elecwhat/user-scripts/*.js`
+* Custom tray icons in `~/.config/elecwhat/user-icons/*.png` by default
 
 ## Why?
 I created this client after due to recurrent stability issues with [WhatSie](https://github.com/keshavbhatt/whatsie).
@@ -81,7 +83,7 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
   "scripts": [
     # ~/.config/elecwhat/user-scripts/myscript.js
     "${userData}/user-scripts/myscripts.js"
-  ]
+  ],
 }
 ```
 

@@ -68,16 +68,42 @@ export function replaceVariables(script) {
   return script.replace("${userData}", app.getPath("userData"));
 }
 
-export async function getIcon(url, userAgent) {
+const userIconCache = new Map();
+
+function getUserIcon(basename, state) {
+  if (userIconCache.has(basename)) {
+    return userIconCache.get(basename);
+  }
+  const dir = state.iconsDir;
+  const filePath = path.join(dir, `${basename}.png`);
+  try {
+    const buffer = readFileSync(filePath);
+    const icon = nativeImage.createFromBuffer(buffer);
+    userIconCache.set(basename, icon);
+    return icon;
+  } catch (e) {
+    // File does not exist or cannot be read
+  }
+  userIconCache.set(basename, null);
+  return null;
+}
+
+export async function getIcon(url, state) {
   const lastPathPart = path.basename(url);
   console.debug("favicon", url, lastPathPart);
+
+  const userIcon = getUserIcon(lastPathPart, state);
+  if (userIcon) {
+    return userIcon;
+  }
+
   // larger images
   url = url.replace("/1x/", "/2x/");
   const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
 
   if (url && re.test(url)) {
     const r = await fetch(url, {
-      headers: { "User-Agent": userAgent },
+      headers: { "User-Agent": state.userAgent },
     });
     if (!r.ok) {
       console.error("fetch", r.status, r.statusText);
