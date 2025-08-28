@@ -10,6 +10,7 @@ import {
   loadUrl,
   replaceVariables,
   getIcon,
+  getUserIcon,
 } from "./util.mjs";
 import { factory } from "electron-json-config";
 import contextMenu from "electron-context-menu";
@@ -166,7 +167,8 @@ function main() {
         return state[name];
       });
 
-      const tray = new Tray(path.join(import.meta.dirname, "..", "static", "app.png"));
+      const trayIcon = getUserIcon("app", state) || path.join(import.meta.dirname, "..", "static", "app.png");
+      const tray = new Tray(trayIcon);
       const contextMenu = Menu.buildFromTemplate([
         {
           label: "Show/Hide",

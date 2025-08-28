@@ -70,7 +70,7 @@ export function replaceVariables(script) {
 
 const userIconCache = new Map();
 
-function getUserIcon(basename, state) {
+export function getUserIcon(basename, state) {
   if (userIconCache.has(basename)) {
     return userIconCache.get(basename);
   }
