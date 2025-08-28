@@ -113,3 +113,14 @@ export async function getIcon(url, state) {
     return nativeImage.createFromBuffer(Buffer.from(ab));
   }
 }
+
+export function loadTranslations(locale) {
+  let translations = {};
+  try {
+    const data = readFileSync(path.join(import.meta.dirname, "..", "locales", `${locale}.json`), "utf-8");
+    translations = JSON.parse(data);
+  } catch (err) {
+    console.error("loadTranslations", locale, err);
+  }
+  return translations;
+}

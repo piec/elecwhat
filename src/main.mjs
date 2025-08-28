@@ -11,6 +11,7 @@ import {
   replaceVariables,
   getIcon,
   getUserIcon,
+  loadTranslations,
 } from "./util.mjs";
 import { factory } from "electron-json-config";
 import contextMenu from "electron-context-menu";
@@ -18,14 +19,6 @@ import { debounce } from "lodash-es";
 
 import pkg from "../package.json" with { type: "json" };
 import * as os from "os";
-
-contextMenu({
-  showSelectAll: false,
-  showSaveImageAs: true,
-  showSaveVideoAs: true,
-  showSearchWithGoogle: false,
-  showInspectElement: isDebug,
-});
 
 const defaultKeys = {
   "A ArrowDown": {
@@ -105,17 +98,32 @@ function main() {
     }
 
     // Sets the spellchecker langs
-    const locale = app.getLocale();
-    console.log("locale", locale);
-    const defaultSpellLang = app.getLocale() || "en-US";
-    console.log("defaultSpellLang", defaultSpellLang);
-    const spellLang = config.get("spellcheck-languages", [defaultSpellLang]);
-    console.log("spellLang", spellLang);
+    const preferredLangs = app.getPreferredSystemLanguages();
+    if (preferredLangs.length == 0) {
+      preferredLangs.push("en-US");
+    }
+    console.log("preferredLangs", preferredLangs);
+
+    const spellLangs = config.get("spellcheck-languages", preferredLangs);
+    console.log("spellLangs", spellLangs);
+
     try {
-      session.defaultSession.setSpellCheckerLanguages(spellLang);
+      session.defaultSession.setSpellCheckerLanguages(spellLangs);
     } catch (err) {
       console.error("setSpellCheckerLanguages", err);
     }
+
+    const lang = preferredLangs[0];
+    const translations = loadTranslations(lang);
+
+    contextMenu({
+      showSelectAll: false,
+      showSaveImageAs: true,
+      showSaveVideoAs: true,
+      showSearchWithGoogle: false,
+      showInspectElement: isDebug,
+      labels: translations,
+    });
 
     session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
       details.requestHeaders["User-Agent"] = state.userAgent;
