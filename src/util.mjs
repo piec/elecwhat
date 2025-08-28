@@ -117,10 +117,11 @@ export async function getIcon(url, state) {
 export function loadTranslations(locale) {
   let translations = {};
   try {
-    const data = readFileSync(path.join(import.meta.dirname, "..", "locales", `${locale}.json`), "utf-8");
+    const filename = locale.split("-")[0];
+    const data = readFileSync(path.join(import.meta.dirname, "..", "locales", `${filename}.json`), "utf-8");
     translations = JSON.parse(data);
   } catch (err) {
-    console.error("loadTranslations", locale, err);
+    console.error("cannot load translations", locale);
   }
   return translations;
 }

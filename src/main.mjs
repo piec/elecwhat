@@ -177,16 +177,16 @@ function main() {
 
       const trayIcon = getUserIcon("app", state) || path.join(import.meta.dirname, "..", "static", "app.png");
       const tray = new Tray(trayIcon);
-      const contextMenu = Menu.buildFromTemplate([
+      const trayContextMenu = Menu.buildFromTemplate([
         {
-          label: "Show/Hide",
+          label: translations?.show_hide ?? "Show/Hide",
           type: "normal",
           click: () => {
             toggleVisibility(mainWindow);
           },
         },
         {
-          label: "Quit",
+          label: translations?.quit ?? "Quit",
           type: "normal",
           click: () => {
             console.log("quit");
@@ -196,7 +196,7 @@ function main() {
         },
       ]);
       tray.setToolTip(pkg.name);
-      tray.setContextMenu(contextMenu);
+      tray.setContextMenu(trayContextMenu);
       tray.on("click", () => {
         toggleVisibility(mainWindow);
       });
