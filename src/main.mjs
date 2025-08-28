@@ -18,13 +18,10 @@ import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
 import * as os from "os";
 
-contextMenu({
-  showSelectAll: false,
-  showSaveImageAs: true,
-  showSaveVideoAs: true,
-  showSearchWithGoogle: false,
-  showInspectElement: isDebug,
-});
+function loadLocaleStrings(locale) {
+  const filePath = path.join(import.meta.dirname, "../locales", `${locale}.json`);
+  return JSON.parse(readFileSync(filePath, "utf-8"));
+}
 
 const defaultKeys = {
   "A ArrowDown": {
@@ -83,31 +80,22 @@ function main() {
     state.showAtStartup = true;
   }
 
-  const createWindow = async () => {
-    // Create the browser window.
-    const mainWindow = new BrowserWindow({
-      webPreferences: {
-        preload: path.join(import.meta.dirname, "..", "src-web", "preload.js"),
-        spellcheck: config.get("spellcheck", true),
-      },
-      show: state.showAtStartup,
-      autoHideMenuBar: config.get("menu-bar-auto-hide", true),
-      ...state.windowBounds,
-    });
+  app.setAboutPanelOptions({
+    applicationName: pkg.name,
+    applicationVersion: app.getVersion(),
+    authors: [pkg?.author?.name],
+    website: pkg?.homepage,
+    // iconPath: "static/app.png", does not work when packaged
+    copyright: pkg?.license,
+  });
 
-    if (!config.get("menu-bar", true)) {
-      mainWindow.removeMenu();
-    }
-
-    if (isDebug || config.get("open-dev-tools", false)) {
-      mainWindow.webContents.openDevTools();
-    }
-
-    // Sets the spellchecker langs
-    const locale = app.getLocale();
+  app.whenReady().then(async () => {
+    const locale = app.getLocale() || "en";
     console.log("locale", locale);
+    const strings = loadLocaleStrings(locale);
+
+    // Spellchecker
     const defaultSpellLang = app.getLocale() || "en-US";
-    console.log("defaultSpellLang", defaultSpellLang);
     const spellLang = config.get("spellcheck-languages", [defaultSpellLang]);
     console.log("spellLang", spellLang);
     try {
@@ -116,41 +104,60 @@ function main() {
       console.error("setSpellCheckerLanguages", err);
     }
 
-    session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
-      details.requestHeaders["User-Agent"] = state.userAgent;
-      callback({ cancel: false, requestHeaders: details.requestHeaders });
-    });
+    const createWindow = async () => {
+      // Create the browser window.
+      const mainWindow = new BrowserWindow({
+        webPreferences: {
+          preload: path.join(import.meta.dirname, "..", "src-web", "preload.js"),
+          spellcheck: config.get("spellcheck", true),
+        },
+        show: state.showAtStartup,
+        autoHideMenuBar: config.get("menu-bar-auto-hide", true),
+        ...state.windowBounds,
+      });
 
-    const saveBounds = () => {
-      if (!isDebug) {
-        persistState.set("window-bounds", mainWindow.getBounds());
+      if (!config.get("menu-bar", true)) {
+        mainWindow.removeMenu();
       }
-    };
 
-    const debounced = debounce(saveBounds, 1000);
-    mainWindow.on("move", debounced);
-    mainWindow.on("resize", debounced);
-    mainWindow.on("close", saveBounds);
+      if (isDebug || config.get("open-dev-tools", false)) {
+        mainWindow.webContents.openDevTools();
+      }
 
-    mainWindow.on("close", function (event) {
-      if (config.get("quit-on-close", false)) {
-        app.quit();
-      } else {
-        console.log(`close ${app.isQuiting}`);
-        if (!app.isQuiting) {
-          event.preventDefault();
-          mainWindow.hide();
-          // event.returnValue = false;
+      session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+        details.requestHeaders["User-Agent"] = state.userAgent;
+        callback({ cancel: false, requestHeaders: details.requestHeaders });
+      });
+
+      const saveBounds = () => {
+        if (!isDebug) {
+          persistState.set("window-bounds", mainWindow.getBounds());
         }
-      }
-    });
+      };
 
-    app.on("before-quit", function () {
-      console.log("before-quit");
-      app.isQuiting = true;
-    });
+      const debounced = debounce(saveBounds, 1000);
+      mainWindow.on("move", debounced);
+      mainWindow.on("resize", debounced);
+      mainWindow.on("close", saveBounds);
 
-    app.whenReady().then(() => {
+      mainWindow.on("close", function (event) {
+        if (config.get("quit-on-close", false)) {
+          app.quit();
+        } else {
+          console.log(`close ${app.isQuiting}`);
+          if (!app.isQuiting) {
+            event.preventDefault();
+            mainWindow.hide();
+            // event.returnValue = false;
+          }
+        }
+      });
+
+      app.on("before-quit", function () {
+        console.log("before-quit");
+        app.isQuiting = true;
+      });
+
       if (isDebug) {
         ipcMain.handle("ping", () => "pong");
       }
@@ -166,17 +173,35 @@ function main() {
         return state[name];
       });
 
+      contextMenu({
+        showSelectAll: false,
+        showSaveImageAs: true,
+        showSaveVideoAs: true,
+        showSearchWithGoogle: false,
+        showInspectElement: isDebug,
+        labels: {
+          cut: strings.cut,
+          copy: strings.copy,
+          paste: strings.paste,
+          copyImage: strings.copyImage,
+          copyLink: strings.copyLink,
+          saveImageAs: strings.saveImageAs,
+          saveVideoAs: strings.saveVideoAs,
+          inspect: strings.inspect,
+        },
+      });
+
       const tray = new Tray(path.join(import.meta.dirname, "..", "static", "app.png"));
-      const contextMenu = Menu.buildFromTemplate([
+      const trayContextMenu = Menu.buildFromTemplate([
         {
-          label: "Show/Hide",
+          label: strings.show_hide,
           type: "normal",
           click: () => {
             toggleVisibility(mainWindow);
           },
         },
         {
-          label: "Quit",
+          label: strings.quit,
           type: "normal",
           click: () => {
             console.log("quit");
@@ -186,7 +211,7 @@ function main() {
         },
       ]);
       tray.setToolTip(pkg.name);
-      tray.setContextMenu(contextMenu);
+      tray.setContextMenu(trayContextMenu);
       tray.on("click", () => {
         toggleVisibility(mainWindow);
       });
@@ -305,23 +330,10 @@ function main() {
             });
         }
       }
-    });
 
-    return mainWindow;
-  };
+      return mainWindow;
+    };
 
-  app.setAboutPanelOptions({
-    applicationName: pkg.name,
-    applicationVersion: app.getVersion(),
-    authors: [pkg?.author?.name],
-    website: pkg?.homepage,
-    // iconPath: "static/app.png", does not work when packaged
-    copyright: pkg?.license,
-  });
-  // This method will be called when Electron has finished
-  // initialization and is ready to create browser windows.
-  // Some APIs can only be used after this event occurs.
-  app.whenReady().then(async () => {
     let window = await createWindow();
 
     addAboutMenuItem();
