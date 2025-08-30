@@ -1,4 +1,4 @@
-import { app, BrowserWindow, session, Menu, Tray, ipcMain, shell, Notification } from "electron";
+import { app, BrowserWindow, session, Menu, Tray, ipcMain, shell, Notification, dialog } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import {
@@ -12,13 +12,14 @@ import {
   getIcon,
   getUserIcon,
   loadTranslations,
+  loadConfig,
 } from "./util.mjs";
-import { factory } from "electron-json-config";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
 
 import pkg from "../package.json" with { type: "json" };
 import * as os from "os";
+import { factory } from "electron-json-config";
 
 const defaultKeys = {
   "A ArrowDown": {
@@ -45,7 +46,7 @@ const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 function main() {
-  const config = factory(undefined, undefined, { prettyJson: { enabled: true } });
+  let { config, configError } = loadConfig();
   console.log("config file", config.file);
 
   const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
@@ -160,6 +161,20 @@ function main() {
     });
 
     app.whenReady().then(() => {
+      if (configError) {
+        const res = dialog.showMessageBoxSync({
+          type: "error",
+          buttons: [
+            translations?.config_continue ?? "Continue with default config",
+            translations?.config_quit ?? "Quit",
+          ],
+          title: translations?.config_title ?? "Configuration file",
+          message: config.file + ":\n\n" + configError,
+        });
+        if (res === 1) {
+          app.quit();
+        }
+      }
       if (isDebug) {
         ipcMain.handle("ping", () => "pong");
       }
