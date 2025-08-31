@@ -1,0 +1,62 @@
+name: Build/release-flatpak
+
+on: push
+
+jobs:
+  release-flatpak:
+    permissions:
+      contents: write
+
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - run: id
+      # - run: flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+      - run: flatpak install flathub org.freedesktop.Sdk/x86_64/20.08 -y
+      - run: flatpak install flathub org.freedesktop.Platform/x86_64/20.08 -y
+      - run: flatpak install flathub app/org.electronjs.Electron2.BaseApp/x86_64/20.08 -y
+
+      - run: npm ci
+      # - run: npm run build
+
+      # - name: Build Flatpak
+      #   uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      #   with:
+      #     manifest-path: flatpak/manifest.yml
+      #     bundle: app.flatpak
+      #     cache-key: flatpak-builder-${{ github.sha }}
+
+      - run: echo 60b725f10c9c85c70d97880dfe8191b3 > /etc/machine-id
+      - run: echo "DBUS_SESSION_BUS_ADDRESS=$(dbus-daemon --session --print-address --fork)" >> $GITHUB_ENV
+      - run: echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+
+      - name: Package with electron-builder
+        run: env DEBUG="@malept/flatpak-bundler" npx electron-builder --linux flatpak
+
+      # - name: Upload Flatpak to release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: ${{ github.ref_name }}
+      #     draft: true
+      #     files: |
+      #       dist/*.flatpak
+      #       app.flatpak
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
