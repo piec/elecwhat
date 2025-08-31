@@ -24,6 +24,7 @@ snap:
     Simple Whatsapp client for linux
   publish:
     - github
+    - snapStore
   slots:
     dbus-svc:
       interface: dbus
