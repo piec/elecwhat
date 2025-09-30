@@ -60,11 +60,7 @@ async function ewSetupKeys() {
     doWhatsappAction.wa?.(whatsappAction);
   }
   function doAction(action) {
-    if (action == "EDIT_LAST_MESSAGE") {
-      ewEditLastMessage();
-    } else {
-      console.error("unknown action", action);
-    }
+    console.error("unknown action", action);
   }
 
   addEventListener("keydown", (ev) => {

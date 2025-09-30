@@ -38,7 +38,7 @@ const defaultKeys = {
     whatsappAction: "TOGGLE_UNREAD",
   },
   "C ArrowUp": {
-    action: "EDIT_LAST_MESSAGE",
+    whatsappAction: "EDIT_LAST_MESSAGE",
   },
 };
 
@@ -235,7 +235,7 @@ function main() {
       mainWindow.webContents.on("did-finish-load", async (ev) => {
         console.log("did-finish-load");
         // builtin scripts
-        const scripts = ["injected.js", "injected-edit.js"];
+        const scripts = ["injected.js"];
         console.log("load scripts", scripts);
         for (const script of scripts) {
           const filename = path.join(import.meta.dirname, "..", "src-web", script);
