@@ -60,21 +60,21 @@ async function ewSetupKeys() {
     doWhatsappAction.wa?.(whatsappAction);
   }
 
-  function openNthChat(chatIndex) {
-    doAction.WAWebCmd = require('WAWebCmd');
-    doAction.WAWebChatCollection = require('WAWebChatCollection');
-    const chat = doAction.WAWebChatCollection?.ChatCollection._models[chatIndex] ?? null;
-
-    if (chat !== null)
-      doAction.WAWebCmd?.Cmd.openChatBottom(chat);
-  }
-
   function doAction(effect) {
     ({
       'OPEN_NTH_CHAT': effect => openNthChat(effect.chatIndex),
       // TODO Add more custom actions
     })
-    [effect.action]?.(effect);
+      [effect.action]?.(effect);
+  }
+
+  function openNthChat(chatIndex) {
+    doAction.WAWebCmd ??= require('WAWebCmd');
+    doAction.WAWebChatCollection ??= require('WAWebChatCollection');
+    const chat = doAction.WAWebChatCollection?.ChatCollection._models[chatIndex] ?? null;
+
+    if (chat !== null)
+      doAction.WAWebCmd?.Cmd.openChatBottom(chat);
   }
 
   addEventListener("keydown", (ev) => {
