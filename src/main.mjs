@@ -40,6 +40,42 @@ const defaultKeys = {
   "C ArrowUp": {
     whatsappAction: "EDIT_LAST_MESSAGE",
   },
+  "C 1": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 0
+  },
+  "C 2": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 1
+  },
+  "C 3": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 2
+  },
+  "C 4": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 3
+  },
+  "C 5": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 4
+  },
+  "C 6": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 5
+  },
+  "C 7": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 6
+  },
+  "C 8": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 7
+  },
+  "C 9": {
+    action: "OPEN_NTH_CHAT",
+    chatIndex: 8
+  },
 };
 
 const defaultUserAgent =
