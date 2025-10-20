@@ -13,6 +13,7 @@ import {
   getUserIcon,
   loadTranslations,
   loadConfig,
+  setBadgeViaDbus,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -291,6 +292,16 @@ function main() {
           // sometimes an old icon takes time to download and arrives late
           if (img && lastFaviconUrl === newestIcon) {
             tray.setImage(img);
+            let messageCount = 0;
+            if(!lastFaviconUrl.startsWith('https://web.whatsapp.com/favicon/1x/favicon') &&
+              lastFaviconUrl.startsWith('https://web.whatsapp.com/favicon/1x/f')) {
+              messageCount =
+                parseInt(lastFaviconUrl.substring('https://web.whatsapp.com/favicon/1x/f'.length).split('/')[0]);
+            }
+            app.setBadgeCount(messageCount); // Doesn't work on linux
+            if(os.platform() === 'linux') {
+              setBadgeViaDbus(messageCount);
+            }
           }
         }
       });

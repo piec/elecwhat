@@ -2,6 +2,8 @@ import { Menu, MenuItem, app, nativeImage, net } from "electron";
 import { factory } from "electron-json-config";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import dbus from "@homebridge/dbus-native";
+import pkg from "../package.json" with { type: "json" };
 
 export const toggleVisibility = function (window) {
   console.debug("toggleVisibility");
@@ -143,4 +145,26 @@ export function loadConfig() {
     configError = err;
   }
   return { config, configError };
+}
+
+export const setBadgeViaDbus = (number) => {
+  const sessionBus = dbus.sessionBus();
+  if(!sessionBus)
+    return;
+
+  dbus.sessionBus().connection.message({
+    type: dbus.messageType.signal,
+    serial: 1,
+    path: "/",
+    interface: "com.canonical.Unity.LauncherEntry",
+    member: "Update",
+    signature: "sa{sv}",
+    body: [
+      "application://" + pkg.name + ".desktop",
+      [
+        ["count", ["x", number]],
+        ["count-visible", ["b", number !== 0]]
+      ]
+    ]
+  });
 }
