@@ -149,6 +149,7 @@ function main() {
         console.log(`close ${app.isQuiting}`);
         if (!app.isQuiting) {
           event.preventDefault();
+          mainWindow.webContents.executeJavaScript('closeChat()');
           mainWindow.hide();
           // event.returnValue = false;
         }
