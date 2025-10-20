@@ -71,7 +71,14 @@ async function ewSetupKeys() {
   function openNthChat(chatIndex) {
     doAction.WAWebCmd ??= require('WAWebCmd');
     doAction.WAWebChatCollection ??= require('WAWebChatCollection');
-    const chat = doAction.WAWebChatCollection?.ChatCollection._models[chatIndex] ?? null;
+
+    let skip = 0;
+    for(let i = 0; i <= chatIndex; i++) {
+      while(doAction.WAWebChatCollection?.ChatCollection._models[i + skip]?.__x_archive) {
+        skip++;
+      }
+    }
+    const chat = doAction.WAWebChatCollection?.ChatCollection._models[chatIndex + skip] ?? null;
 
     if (chat !== null)
       doAction.WAWebCmd?.Cmd.openChatBottom(chat);
