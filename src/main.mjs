@@ -329,18 +329,6 @@ function main() {
       } else {
         mainWindow.webContents.loadURL(url);
       }
-
-      if (os.platform == "linux") {
-        if (config.get("dbus", true)) {
-          import("./main-dbus.mjs")
-            .then((dbus) => {
-              dbus.mainDbus(mainWindow);
-            })
-            .catch((err) => {
-              console.error("dbus", err);
-            });
-        }
-      }
     });
 
     return mainWindow;
