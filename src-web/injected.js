@@ -59,8 +59,29 @@ async function ewSetupKeys() {
     }
     doWhatsappAction.wa?.(whatsappAction);
   }
-  function doAction(action) {
-    console.error("unknown action", action);
+
+  function doAction(effect) {
+    ({
+      'OPEN_NTH_CHAT': effect => openNthChat(effect.chatIndex),
+      // TODO Add more custom actions
+    })
+      [effect.action]?.(effect);
+  }
+
+  function openNthChat(chatIndex) {
+    doAction.WAWebCmd ??= require('WAWebCmd');
+    doAction.WAWebChatCollection ??= require('WAWebChatCollection');
+
+    let skip = 0;
+    for(let i = 0; i <= chatIndex; i++) {
+      while(doAction.WAWebChatCollection?.ChatCollection._models[i + skip]?.__x_archive) {
+        skip++;
+      }
+    }
+    const chat = doAction.WAWebChatCollection?.ChatCollection._models[chatIndex + skip] ?? null;
+
+    if (chat !== null)
+      doAction.WAWebCmd?.Cmd.openChatBottom(chat);
   }
 
   addEventListener("keydown", (ev) => {
@@ -77,7 +98,7 @@ async function ewSetupKeys() {
         if (typeof effect?.whatsappAction === "string") {
           doWhatsappAction(effect.whatsappAction);
         } else if (typeof effect?.action === "string") {
-          doAction(effect.action);
+          doAction(effect);
         }
       }
     }
