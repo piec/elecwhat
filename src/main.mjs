@@ -13,7 +13,6 @@ import {
   getUserIcon,
   loadTranslations,
   loadConfig,
-  setBadgeViaDbus,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -21,6 +20,7 @@ import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
 import * as os from "os";
 import { factory } from "electron-json-config";
+import { DbusManager } from "./DbusManager.mjs";
 
 const defaultKeys = {
   "A ArrowDown": {
@@ -42,6 +42,8 @@ const defaultKeys = {
     whatsappAction: "EDIT_LAST_MESSAGE",
   },
 };
+
+const dbusManager = new DbusManager();
 
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -158,6 +160,7 @@ function main() {
 
     app.on("before-quit", function () {
       console.log("before-quit");
+      dbusManager.end();
       app.isQuiting = true;
     });
 
@@ -299,9 +302,7 @@ function main() {
                 parseInt(lastFaviconUrl.substring('https://web.whatsapp.com/favicon/1x/f'.length).split('/')[0]);
             }
             app.setBadgeCount(messageCount); // Doesn't work on linux
-            if(os.platform() === 'linux') {
-              setBadgeViaDbus(messageCount);
-            }
+            dbusManager.setBadgeCount(messageCount); // Only works on linux
           }
         }
       });

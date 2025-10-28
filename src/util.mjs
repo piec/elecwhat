@@ -93,7 +93,6 @@ export function getUserIcon(basename, state) {
 
 export async function getIcon(url, state) {
   const lastPathPart = path.basename(url);
-  console.debug("favicon", url, lastPathPart);
 
   const userIcon = getUserIcon(lastPathPart, state);
   if (userIcon) {
@@ -145,26 +144,4 @@ export function loadConfig() {
     configError = err;
   }
   return { config, configError };
-}
-
-export const setBadgeViaDbus = (number) => {
-  const sessionBus = dbus.sessionBus();
-  if(!sessionBus)
-    return;
-
-  dbus.sessionBus().connection.message({
-    type: dbus.messageType.signal,
-    serial: 1,
-    path: "/",
-    interface: "com.canonical.Unity.LauncherEntry",
-    member: "Update",
-    signature: "sa{sv}",
-    body: [
-      "application://" + pkg.name + ".desktop",
-      [
-        ["count", ["x", number]],
-        ["count-visible", ["b", number !== 0]]
-      ]
-    ]
-  });
 }
