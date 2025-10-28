@@ -2,8 +2,6 @@ import { Menu, MenuItem, app, nativeImage, net } from "electron";
 import { factory } from "electron-json-config";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import dbus from "@homebridge/dbus-native";
-import pkg from "../package.json" with { type: "json" };
 
 export const toggleVisibility = function (window) {
   console.debug("toggleVisibility");
