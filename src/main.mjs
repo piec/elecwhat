@@ -20,7 +20,7 @@ import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
 import * as os from "os";
 import { factory } from "electron-json-config";
-import { DbusManager } from "./DbusManager.mjs";
+import { DbusManager } from "./dbus.mjs";
 
 const defaultKeys = {
   "A ArrowDown": {
