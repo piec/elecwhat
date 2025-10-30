@@ -129,7 +129,7 @@ function main() {
         console.log(`close ${app.isQuiting}`);
         if (!app.isQuiting) {
           event.preventDefault();
-          mainWindow.webContents.executeJavaScript('ewCloseChat()');
+          mainWindow.webContents.executeJavaScript("ewCloseChat()");
           mainWindow.hide();
           // event.returnValue = false;
         }
