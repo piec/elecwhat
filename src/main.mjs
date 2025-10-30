@@ -170,6 +170,9 @@ function main() {
         console.log("stateGet", name);
         return state[name];
       });
+      ipcMain.handle("windowToggle", () => {
+        toggleVisibility(mainWindow);
+      });
 
       const trayIcon = getUserIcon("app", state) || path.join(import.meta.dirname, "..", "static", "app.png");
       const tray = new Tray(trayIcon);
