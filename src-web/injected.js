@@ -80,8 +80,10 @@ async function ewSetupKeys() {
     }
     const chat = doAction.WAWebChatCollection?.ChatCollection._models[chatIndex + skip] ?? null;
 
-    if (chat !== null)
+    if (chat !== null) {
+      chat.chat = chat;
       doAction.WAWebCmd?.Cmd.openChatBottom(chat);
+    }
   }
 
   addEventListener("keydown", (ev) => {
