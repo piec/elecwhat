@@ -62,19 +62,18 @@ async function ewSetupKeys() {
 
   function doAction(effect) {
     ({
-      'OPEN_NTH_CHAT': effect => openNthChat(effect.chatIndex),
+      OPEN_NTH_CHAT: (effect) => openNthChat(effect.chatIndex),
       // TODO Add more custom actions
-    })
-      [effect.action]?.(effect);
+    })[effect.action]?.(effect);
   }
 
   function openNthChat(chatIndex) {
-    doAction.WAWebCmd ??= require('WAWebCmd');
-    doAction.WAWebChatCollection ??= require('WAWebChatCollection');
+    doAction.WAWebCmd ??= require("WAWebCmd");
+    doAction.WAWebChatCollection ??= require("WAWebChatCollection");
 
     let skip = 0;
-    for(let i = 0; i <= chatIndex; i++) {
-      while(doAction.WAWebChatCollection?.ChatCollection._models[i + skip]?.__x_archive) {
+    for (let i = 0; i <= chatIndex; i++) {
+      while (doAction.WAWebChatCollection?.ChatCollection._models[i + skip]?.__x_archive) {
         skip++;
       }
     }
@@ -118,3 +117,8 @@ async function ewSetup() {
 }
 
 void ewSetup();
+
+function ewCloseChat() {
+  ewCloseChat.WAKeyboardRun ??= importDefault("WAWebKeyboardRun");
+  ewCloseChat.WAKeyboardRun?.("CLOSE_CHAT");
+}

@@ -20,63 +20,7 @@ import { debounce } from "lodash-es";
 import pkg from "../package.json" with { type: "json" };
 import * as os from "os";
 import { factory } from "electron-json-config";
-
-const defaultKeys = {
-  "A ArrowDown": {
-    whatsappAction: "GO_TO_NEXT_CHAT",
-  },
-  "A ArrowUp": {
-    whatsappAction: "GO_TO_PREV_CHAT",
-  },
-  "C Tab": {
-    whatsappAction: "GO_TO_NEXT_CHAT",
-  },
-  "CS Tab": {
-    whatsappAction: "GO_TO_PREV_CHAT",
-  },
-  "C u": {
-    whatsappAction: "TOGGLE_UNREAD",
-  },
-  "C ArrowUp": {
-    whatsappAction: "EDIT_LAST_MESSAGE",
-  },
-  "C 1": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 0
-  },
-  "C 2": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 1
-  },
-  "C 3": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 2
-  },
-  "C 4": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 3
-  },
-  "C 5": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 4
-  },
-  "C 6": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 5
-  },
-  "C 7": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 6
-  },
-  "C 8": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 7
-  },
-  "C 9": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 8
-  },
-};
+import { defaultKeys } from "./keys.mjs";
 
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -185,6 +129,7 @@ function main() {
         console.log(`close ${app.isQuiting}`);
         if (!app.isQuiting) {
           event.preventDefault();
+          mainWindow.webContents.executeJavaScript("ewCloseChat()");
           mainWindow.hide();
           // event.returnValue = false;
         }
@@ -224,6 +169,9 @@ function main() {
       ipcMain.handle("stateGet", (ev, name) => {
         console.log("stateGet", name);
         return state[name];
+      });
+      ipcMain.handle("windowToggle", () => {
+        toggleVisibility(mainWindow);
       });
 
       const trayIcon = getUserIcon("app", state) || path.join(import.meta.dirname, "..", "static", "app.png");
