@@ -29,6 +29,15 @@ function hijackClick() {
   });
 }
 
+function ewDoWhatsappAction(whatsappAction) {
+  if (ewDoWhatsappAction.wa == null) {
+    if (importDefault) {
+      ewDoWhatsappAction.wa = importDefault("WAWebKeyboardRun");
+    }
+  }
+  ewDoWhatsappAction.wa?.(whatsappAction);
+}
+
 async function ewSetupKeys() {
   const keys = await window?.ipc?.stateGet("keys");
 
@@ -50,15 +59,6 @@ async function ewSetupKeys() {
   }
 
   console.debug("keys", keys);
-
-  function doWhatsappAction(whatsappAction) {
-    if (doWhatsappAction.wa == null) {
-      if (importDefault) {
-        doWhatsappAction.wa = importDefault("WAWebKeyboardRun");
-      }
-    }
-    doWhatsappAction.wa?.(whatsappAction);
-  }
 
   function doAction(effect) {
     ({
@@ -97,7 +97,7 @@ async function ewSetupKeys() {
       if (match) {
         console.log("effect", effect);
         if (typeof effect?.whatsappAction === "string") {
-          doWhatsappAction(effect.whatsappAction);
+          ewDoWhatsappAction(effect.whatsappAction);
         } else if (typeof effect?.action === "string") {
           doAction(effect);
         }
@@ -119,6 +119,5 @@ async function ewSetup() {
 void ewSetup();
 
 function ewCloseChat() {
-  ewCloseChat.WAKeyboardRun ??= importDefault("WAWebKeyboardRun");
-  ewCloseChat.WAKeyboardRun?.("CLOSE_CHAT");
+  ewDoWhatsappAction("CLOSE_CHAT");
 }

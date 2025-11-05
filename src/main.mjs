@@ -116,11 +116,18 @@ function main() {
         persistState.set("window-bounds", mainWindow.getBounds());
       }
     };
+    const closeChat = () => {
+      // or use https://www.electronjs.org/docs/latest/tutorial/ipc#pattern-3-main-to-renderer
+      mainWindow.webContents.executeJavaScript("ewCloseChat()");
+    };
 
     const debounced = debounce(saveBounds, 1000);
     mainWindow.on("move", debounced);
     mainWindow.on("resize", debounced);
     mainWindow.on("close", saveBounds);
+    mainWindow.on("hide", () => {
+      closeChat();
+    });
 
     mainWindow.on("close", function (event) {
       if (config.get("quit-on-close", false)) {
@@ -129,7 +136,7 @@ function main() {
         console.log(`close ${app.isQuiting}`);
         if (!app.isQuiting) {
           event.preventDefault();
-          mainWindow.webContents.executeJavaScript("ewCloseChat()");
+          closeChat();
           mainWindow.hide();
           // event.returnValue = false;
         }
