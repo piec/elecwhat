@@ -289,7 +289,6 @@ function main() {
             tray.setImage(img);
             // we could also extract it from the page title, may be more reliable
             const unreadCount = getUnreadCountFromFavicon(lastFaviconUrl);
-            console.log("unreadCount", unreadCount);
             app.setBadgeCount(unreadCount); // libunity
             dbus.setBadgeCount(unreadCount); // gnome, kde
           }
