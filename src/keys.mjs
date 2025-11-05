@@ -1,3 +1,10 @@
+const nthChatBindings = Object.fromEntries(
+  ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"].flatMap((key, index) => [
+    [`A ${key}`, { action: "OPEN_NTH_CHAT", chatIndex: index }],
+    [`C ${key}`, { action: "OPEN_NTH_CHAT", chatIndex: index }],
+  ])
+);
+
 export const defaultKeys = {
   "A ArrowDown": {
     whatsappAction: "GO_TO_NEXT_CHAT",
@@ -17,41 +24,5 @@ export const defaultKeys = {
   "C ArrowUp": {
     whatsappAction: "EDIT_LAST_MESSAGE",
   },
-  // TODO: adapt to keyboards like the azerty french keyboard
-  "C 1": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 0,
-  },
-  "C 2": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 1,
-  },
-  "C 3": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 2,
-  },
-  "C 4": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 3,
-  },
-  "C 5": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 4,
-  },
-  "C 6": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 5,
-  },
-  "C 7": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 6,
-  },
-  "C 8": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 7,
-  },
-  "C 9": {
-    action: "OPEN_NTH_CHAT",
-    chatIndex: 8,
-  },
+  ...nthChatBindings,
 };
