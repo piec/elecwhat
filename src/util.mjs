@@ -71,12 +71,16 @@ export function replaceVariables(script) {
 
 const userIconCache = new Map();
 
-export function getUserIcon(basename, state) {
+export function getUserIcon(url, state) {
+  url = url.replace(/v[0-9]+\//, "");
+  const basename = path.basename(url);
+
   if (userIconCache.has(basename)) {
     return userIconCache.get(basename);
   }
   const dir = state.iconsDir;
   const filePath = path.join(dir, `${basename}.png`);
+  console.debug("favicon", basename, filePath);
   try {
     const buffer = readFileSync(filePath);
     const icon = nativeImage.createFromBuffer(buffer);
@@ -90,10 +94,7 @@ export function getUserIcon(basename, state) {
 }
 
 export async function getIcon(url, state) {
-  const lastPathPart = path.basename(url);
-  console.debug("favicon", url, lastPathPart);
-
-  const userIcon = getUserIcon(lastPathPart, state);
+  const userIcon = getUserIcon(url, state);
   if (userIcon) {
     return userIcon;
   }
@@ -107,7 +108,7 @@ export async function getIcon(url, state) {
       headers: { "User-Agent": state.userAgent },
     });
     if (!r.ok) {
-      console.error("fetch", r.status, r.statusText);
+      console.error("fetch", url, r.status, r.statusText);
       return null;
     }
     const ab = await r.arrayBuffer();
