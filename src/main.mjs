@@ -13,14 +13,14 @@ import {
   getUserIcon,
   loadTranslations,
   loadConfig,
+  getUnreadCountFromFavicon,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
 
 import pkg from "../package.json" with { type: "json" };
-import * as os from "os";
 import { factory } from "electron-json-config";
-import { DbusManager } from "./dbus.mjs";
+import { Dbus } from "./dbus.mjs";
 
 const defaultKeys = {
   "A ArrowDown": {
@@ -43,7 +43,7 @@ const defaultKeys = {
   },
 };
 
-const dbusManager = new DbusManager();
+const dbus = new Dbus();
 
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -92,6 +92,7 @@ function main() {
       autoHideMenuBar: config.get("menu-bar-auto-hide", true),
       ...state.windowBounds,
     });
+    dbus.window = mainWindow;
 
     if (!config.get("menu-bar", true)) {
       mainWindow.removeMenu();
@@ -160,7 +161,7 @@ function main() {
 
     app.on("before-quit", function () {
       console.log("before-quit");
-      dbusManager.end();
+      dbus.end();
       app.isQuiting = true;
     });
 
@@ -295,14 +296,11 @@ function main() {
           // sometimes an old icon takes time to download and arrives late
           if (img && lastFaviconUrl === newestIcon) {
             tray.setImage(img);
-            let messageCount = 0;
-            if(!lastFaviconUrl.startsWith('https://web.whatsapp.com/favicon/1x/favicon') &&
-              lastFaviconUrl.startsWith('https://web.whatsapp.com/favicon/1x/f')) {
-              messageCount =
-                parseInt(lastFaviconUrl.substring('https://web.whatsapp.com/favicon/1x/f'.length).split('/')[0]);
-            }
-            app.setBadgeCount(messageCount); // Doesn't work on linux
-            dbusManager.setBadgeCount(messageCount); // Only works on linux
+            // we could also extract it from the page title, may be more reliable
+            const unreadCount = getUnreadCountFromFavicon(lastFaviconUrl);
+            console.log("unreadCount", unreadCount);
+            app.setBadgeCount(unreadCount); // libunity
+            dbus.setBadgeCount(unreadCount); // gnome, kde
           }
         }
       });

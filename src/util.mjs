@@ -143,3 +143,8 @@ export function loadConfig() {
   }
   return { config, configError };
 }
+
+export function getUnreadCountFromFavicon(faviconUrl) {
+  const match = faviconUrl.match(/https:\/\/web\.whatsapp\.com\/favicon\/1x\/f(\d+)\//);
+  return match ? parseInt(match[1], 10) : 0;
+}
