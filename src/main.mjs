@@ -13,14 +13,17 @@ import {
   getUserIcon,
   loadTranslations,
   loadConfig,
+  getUnreadCountFromFavicon,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
 
 import pkg from "../package.json" with { type: "json" };
-import * as os from "os";
 import { factory } from "electron-json-config";
 import { defaultKeys } from "./keys.mjs";
+import { Dbus } from "./dbus.mjs";
+
+const dbus = new Dbus();
 
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -34,7 +37,7 @@ function main() {
   console.log("state file", persistState.file);
 
   const state = {
-    notifPrefix: config.get("notification-prefix") ?? `${pkg.name} - `,
+    notifPrefix: config.get("notification-prefix") ?? "",
     showAtStartup: isDebug || config.get("show-at-startup", true),
     get windowBounds() {
       const bounds = persistState.get("window-bounds", { width: 1099, height: 800 });
@@ -69,6 +72,7 @@ function main() {
       autoHideMenuBar: config.get("menu-bar-auto-hide", true),
       ...state.windowBounds,
     });
+    dbus.window = mainWindow;
 
     if (!config.get("menu-bar", true)) {
       mainWindow.removeMenu();
@@ -145,6 +149,7 @@ function main() {
 
     app.on("before-quit", function () {
       console.log("before-quit");
+      dbus.end();
       app.isQuiting = true;
     });
 
@@ -282,6 +287,11 @@ function main() {
           // sometimes an old icon takes time to download and arrives late
           if (img && lastFaviconUrl === newestIcon) {
             tray.setImage(img);
+            // we could also extract it from the page title, may be more reliable
+            const unreadCount = getUnreadCountFromFavicon(lastFaviconUrl);
+            console.log("unreadCount", unreadCount);
+            app.setBadgeCount(unreadCount); // libunity
+            dbus.setBadgeCount(unreadCount); // gnome, kde
           }
         }
       });
@@ -308,18 +318,6 @@ function main() {
         mainWindow.webContents.loadFile("static/debug.html");
       } else {
         mainWindow.webContents.loadURL(url);
-      }
-
-      if (os.platform == "linux") {
-        if (config.get("dbus", true)) {
-          import("./main-dbus.mjs")
-            .then((dbus) => {
-              dbus.mainDbus(mainWindow);
-            })
-            .catch((err) => {
-              console.error("dbus", err);
-            });
-        }
       }
     });
 
