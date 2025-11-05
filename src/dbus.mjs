@@ -3,8 +3,8 @@ import * as os from "node:os";
 import { app } from "electron";
 import { toggleVisibility, windowShow } from "./util.mjs";
 
-const SERVICE_NAME = 'fr.carru.elecwhat';
-const OBJECT_PATH = '/' + SERVICE_NAME.replaceAll('.', '/');
+const SERVICE_NAME = "fr.carru.elecwhat";
+const OBJECT_PATH = "/" + SERVICE_NAME.replaceAll(".", "/");
 
 export class Dbus {
   sessionBus = null;
@@ -12,7 +12,7 @@ export class Dbus {
   serialCounter = 0;
 
   constructor() {
-    if(os.platform() !== 'linux') {
+    if (os.platform() !== "linux") {
       return;
     }
 
@@ -36,22 +36,37 @@ export class Dbus {
         return;
       }
 
-      this.sessionBus?.exportInterface({
-        Show: () => { if(this.window) windowShow(this.window); },
-        Hide: () => { this.window?.hide(); },
-        Visible: () => { return this.window?.isVisible() ?? false; },
-        ToggleVisibility: () => { if (this.window) return toggleVisibility(this.window); else return false; },
-        Quit: () => { app.quit(); },
-      }, OBJECT_PATH, {
-        name: SERVICE_NAME,
-        methods: {
-          Show: ["", ""],
-          Hide: ["", ""],
-          ToggleVisibility: ["", "b"],
-          Visible: ["", "b"],
-          Quit: ["", ""],
+      this.sessionBus?.exportInterface(
+        {
+          Show: () => {
+            if (this.window) windowShow(this.window);
+          },
+          Hide: () => {
+            this.window?.hide();
+          },
+          Visible: () => {
+            return this.window?.isVisible() ?? false;
+          },
+          ToggleVisibility: () => {
+            if (this.window) return toggleVisibility(this.window);
+            else return false;
+          },
+          Quit: () => {
+            app.quit();
+          },
         },
-      });
+        OBJECT_PATH,
+        {
+          name: SERVICE_NAME,
+          methods: {
+            Show: ["", ""],
+            Hide: ["", ""],
+            ToggleVisibility: ["", "b"],
+            Visible: ["", "b"],
+            Quit: ["", ""],
+          },
+        },
+      );
 
       console.log("DBus registered:", SERVICE_NAME);
     });
@@ -72,9 +87,9 @@ export class Dbus {
         "application://elecwhat.desktop",
         [
           ["count", ["x", number]],
-          ["count-visible", ["b", number !== 0]]
-        ]
-      ]
+          ["count-visible", ["b", number !== 0]],
+        ],
+      ],
     });
   }
 
