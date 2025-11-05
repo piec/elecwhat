@@ -40,6 +40,7 @@ function ewDoWhatsappAction(whatsappAction) {
 
 async function ewSetupKeys() {
   const keys = await window?.ipc?.stateGet("keys");
+  const kMap = await navigator.keyboard?.getLayoutMap?.();
 
   const parsedCache = {};
   function parseBinding(binding) {
@@ -47,8 +48,15 @@ async function ewSetupKeys() {
       return parsedCache[binding];
     }
     const [modifiers, key] = binding.split(" ");
+    let mapped;
+    // if key is digit, use correct key for other keyboard layouts (like azerty)
+    if (kMap && key.length == 1 && key >= "0" && key <= "9") {
+      mapped = kMap.get(`Digit${key}`);
+      console.debug("mapped", key, "to", mapped);
+    }
+
     const parsed = {
-      key,
+      key: mapped ?? key,
       ctrlKey: modifiers.includes("C"),
       shiftKey: modifiers.includes("S"),
       altKey: modifiers.includes("A"),
