@@ -1,6 +1,6 @@
 console.log("injected.js");
 
-function hijackNotif(prefix) {
+function ewHijackNotif(prefix) {
   window.realNotification = window.Notification;
 
   const override = {
@@ -19,7 +19,7 @@ function hijackNotif(prefix) {
   window.Notification = new Proxy(window.realNotification, override);
 }
 
-function hijackClick() {
+function ewHijackClick() {
   document.body.addEventListener("click", (ev) => {
     if (!(ev.target instanceof HTMLAnchorElement)) return;
     if (ev.target.tagName === "A" && ev.target.getAttribute("target") === "_blank") {
@@ -97,9 +97,7 @@ async function ewSetupKeys() {
     for (let [binding, effect] of Object.entries(keys)) {
       const parsed = parseBinding(binding);
       let match = true;
-      // console.log("parsed", parsed);
       for (let [k, v] of Object.entries(parsed)) {
-        // console.log("k", k, "v", v);
         match &&= ev?.[k] == v;
       }
       if (match) {
@@ -115,11 +113,11 @@ async function ewSetupKeys() {
 }
 
 async function ewSetup() {
-  console.log("hijack");
-  hijackClick();
+  console.log("ewSetup");
+  ewHijackClick();
 
   const prefix = await window?.ipc?.stateGet?.("notifPrefix");
-  hijackNotif(prefix);
+  ewHijackNotif(prefix);
 
   await ewSetupKeys();
 
