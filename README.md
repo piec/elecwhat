@@ -5,8 +5,8 @@
 
 ## Features
 * Desktop notifications
-* Tray icon with unread count (aka AppIndicator)
-* Custom keyboard shortcuts ([default](https://github.com/piec/elecwhat/blob/5128cfa83dc8b2a54084e39df35e9d6a2a1317ce/src/main.mjs#L10-L29))
+* Tray icon with unread count (aka AppIndicator), [custom tray icons](https://github.com/piec/elecwhat/issues/30#issuecomment-3470456738).
+* Custom keyboard shortcuts ([default](https://github.com/piec/elecwhat/blob/master/src/keys.mjs))
 * Custom CSS
 * Spellcheck
 * CLI & D-Bus interface to show/hide/toggle window
