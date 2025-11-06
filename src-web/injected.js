@@ -122,6 +122,24 @@ async function ewSetup() {
   hijackNotif(prefix);
 
   await ewSetupKeys();
+
+  if (await window?.ipc?.stateGet("escToggle")) {
+    addEventListener(
+      "keydown",
+      (ev) => {
+        if (ev.key === "Escape") {
+          const chatOpen = document.getElementById("main");
+          if (!chatOpen) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            console.log("esc: toggle window");
+            window?.ipc?.windowToggle?.();
+          }
+        }
+      },
+      true,
+    );
+  }
 }
 
 void ewSetup();
