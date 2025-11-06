@@ -12,10 +12,11 @@ export class Dbus {
   window = null;
   serialCounter = 0;
 
-  constructor() {
+  constructor(window) {
     if (os.platform() !== "linux") {
       return;
     }
+    this.window = window;
 
     try {
       this.sessionBus = dbus.sessionBus();
