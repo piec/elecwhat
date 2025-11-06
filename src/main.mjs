@@ -17,6 +17,7 @@ import {
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
+import { consola, LogLevels } from "consola";
 
 import pkg from "../package.json" with { type: "json" };
 import { factory } from "electron-json-config";
@@ -28,11 +29,18 @@ const defaultUserAgent =
 
 function main() {
   let { config, configError } = loadConfig();
-  console.log("config file", config.file);
+
+  // Configure log level: CLI option takes priority over config option
+  const cliLogLevel = process.argv.find((arg) => arg.startsWith("--log-level="))?.split("=")[1];
+  const configLogLevel = config.get("log-level", "info");
+  const logLevelStr = cliLogLevel || configLogLevel;
+  consola.level = LogLevels[logLevelStr] ?? 3;
+
+  consola.info("config file", config.file);
 
   const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
   const persistState = factory(persistStateFileName, "state", { prettyJson: { enabled: true } });
-  console.log("state file", persistState.file);
+  consola.info("state file", persistState.file);
 
   const state = {
     notifPrefix: config.get("notification-prefix", ""),
@@ -85,15 +93,15 @@ function main() {
     if (preferredLangs.length == 0) {
       preferredLangs.push("en-US");
     }
-    console.log("preferredLangs", preferredLangs);
+    consola.debug("preferredLangs", preferredLangs);
 
     const spellLangs = config.get("spellcheck-languages", preferredLangs);
-    console.log("spellLangs", spellLangs);
+    consola.debug("spellLangs", spellLangs);
 
     try {
       session.defaultSession.setSpellCheckerLanguages(spellLangs);
     } catch (err) {
-      console.error("setSpellCheckerLanguages", err);
+      consola.error("setSpellCheckerLanguages", err);
     }
 
     const lang = preferredLangs[0];
@@ -135,7 +143,7 @@ function main() {
       if (config.get("quit-on-close", false)) {
         app.quit();
       } else {
-        console.log(`close ${app.isQuiting}`);
+        consola.debug(`close ${app.isQuiting}`);
         if (!app.isQuiting) {
           event.preventDefault();
           closeChat();
@@ -147,7 +155,7 @@ function main() {
 
     let dbus;
     app.on("before-quit", function () {
-      console.log("before-quit");
+      consola.debug("before-quit");
       dbus?.end();
       app.isQuiting = true;
     });
@@ -177,11 +185,11 @@ function main() {
         windowShow(mainWindow);
       });
       ipcMain.handle("open", (ev, url) => {
-        console.log("url", url);
+        consola.debug("url", url);
         shell.openExternal(url);
       });
       ipcMain.handle("stateGet", (ev, name) => {
-        console.log("stateGet", name);
+        consola.debug("stateGet", name);
         return state[name];
       });
       ipcMain.handle("windowToggle", () => {
@@ -202,7 +210,7 @@ function main() {
           label: translations?.quit ?? "Quit",
           type: "normal",
           click: () => {
-            console.log("quit");
+            consola.debug("quit");
             app.isQuiting = true;
             app.quit();
           },
@@ -227,14 +235,14 @@ function main() {
         try {
           await mainWindow.webContents.executeJavaScript(data);
         } catch (err) {
-          console.error("executeJavaScript", err);
+          consola.error("executeJavaScript", err);
         }
       }
       mainWindow.webContents.on("did-finish-load", async (ev) => {
-        console.log("did-finish-load");
+        consola.debug("did-finish-load");
         // builtin scripts
         const scripts = ["injected.js"];
-        console.log("load scripts", scripts);
+        consola.debug("load scripts", scripts);
         for (const script of scripts) {
           const filename = path.join(import.meta.dirname, "..", "src-web", script);
           const data = readFileSync(filename, "utf-8");
@@ -246,13 +254,13 @@ function main() {
         for (let filename of config.get("scripts", [])) {
           filename = replaceVariables(filename);
           filename = path.resolve(filename);
-          console.log("load user script", filename);
+          consola.info("load user script", filename);
           if (!filename.startsWith(userScriptsPath)) {
-            console.error(`script must be in ${userScriptsPath}:`, filename);
+            consola.error(`script must be in ${userScriptsPath}:`, filename);
             continue;
           }
           if (!filename.endsWith(".js")) {
-            console.error("script must end with .js", filename);
+            consola.error("script must end with .js", filename);
             continue;
           }
           const data = readFileSync(filename, "utf-8");
@@ -274,7 +282,7 @@ function main() {
               mainWindow.webContents.insertCSS(data);
             }
           } catch (err) {
-            console.error(`error inserting ${css}`, err);
+            consola.error(`error inserting ${css}`, err);
           }
         }
       });
@@ -299,7 +307,7 @@ function main() {
 
       const url = config.get("url", "https://web.whatsapp.com/");
       mainWindow.webContents.on("did-fail-load", async (ev) => {
-        console.log("did-fail-load");
+        consola.warn("did-fail-load");
         notif({
           body: "Failed to load",
         }).on("click", () => {
@@ -308,7 +316,7 @@ function main() {
 
         setTimeout(
           () => {
-            console.log("retry");
+            consola.info("retry");
             mainWindow.webContents.loadURL(url);
           },
           config.get("retry-interval", 15000),
@@ -349,7 +357,7 @@ function main() {
     });
 
     app.on("second-instance", (event, commandLine, workingDirectory, additionalData) => {
-      console.log("second-instance", additionalData, commandLine);
+      consola.debug("second-instance", additionalData, commandLine);
 
       if (window) {
         if (commandLine.includes("--hide")) {
@@ -374,7 +382,7 @@ function main() {
   // for applications and their menu bar to stay active until the user quits
   // explicitly with Cmd + Q.
   app.on("window-all-closed", () => {
-    console.log("window-all-closed");
+    consola.debug("window-all-closed");
     if (process.platform !== "darwin") app.quit();
   });
 }
@@ -382,7 +390,7 @@ function main() {
 const gotTheLock = app.requestSingleInstanceLock({ name: pkg.name });
 
 if (!gotTheLock) {
-  console.log("already running, raised the main window");
+  consola.info("already running, raised the main window");
   app.quit();
 } else {
   main();

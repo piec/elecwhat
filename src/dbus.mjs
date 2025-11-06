@@ -3,6 +3,7 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { app } from "electron";
 import { toggleVisibility, windowShow } from "./util.mjs";
+import { consola } from "consola";
 
 const SERVICE_NAME = "fr.carru.elecwhat";
 const OBJECT_PATH = "/" + SERVICE_NAME.replaceAll(".", "/");
@@ -25,12 +26,12 @@ export class Dbus {
     }
 
     if (!this.sessionBus) {
-      console.error("DBus: not connected to session bus");
+      consola.error("DBus: not connected to session bus");
       return;
     }
     this.sessionBus.requestName(SERVICE_NAME, 0x4, (err, retCode) => {
       if (err) {
-        console.error("Error DBus:", err);
+        consola.error("Error DBus:", err);
         return;
       }
 
@@ -70,7 +71,7 @@ export class Dbus {
         },
       );
 
-      console.log("DBus registered:", SERVICE_NAME);
+      consola.info("DBus registered:", SERVICE_NAME);
     });
   }
 

@@ -2,9 +2,10 @@ import { Menu, MenuItem, app, nativeImage, net } from "electron";
 import { factory } from "electron-json-config";
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { consola } from "consola";
 
 export const toggleVisibility = function (window) {
-  console.debug("toggleVisibility");
+  consola.debug("toggleVisibility");
   const vis = window.isVisible();
   if (vis) {
     window.hide();
@@ -35,7 +36,7 @@ export function windowShow(window) {
 export async function loadUrl(url, protocols = ["file:", "https:"]) {
   let data = null;
   if (!protocols.includes(url.protocol)) {
-    console.error("unsupported protocol", url.protocol);
+    consola.error("unsupported protocol", url.protocol);
     return null;
   }
   if (url.protocol == "file:") {
@@ -43,15 +44,15 @@ export async function loadUrl(url, protocols = ["file:", "https:"]) {
     if (url.hostname == "~") {
       path = app.getPath("home") + path;
     }
-    console.log("load from file", path);
+    consola.debug("load from file", path);
     data = readFileSync(path, "utf-8");
   } else if (url.protocol == "https:") {
-    console.log("load from", url.href);
+    consola.debug("load from", url.href);
     const res = await net.fetch(url.href);
     if (res.ok) {
       data = await res.text();
     } else {
-      console.error("fetch", res.status, res.statusText);
+      consola.error("fetch", res.status, res.statusText);
     }
   }
   return data;
@@ -80,7 +81,7 @@ export function getUserIcon(url, state) {
   }
   const dir = state.iconsDir;
   const filePath = path.join(dir, `${basename}.png`);
-  console.debug("favicon", basename, filePath);
+  consola.debug("favicon", basename, filePath);
   try {
     const buffer = readFileSync(filePath);
     const icon = nativeImage.createFromBuffer(buffer);
@@ -108,7 +109,7 @@ export async function getIcon(url, state) {
       headers: { "User-Agent": state.userAgent },
     });
     if (!r.ok) {
-      console.error("fetch", url, r.status, r.statusText);
+      consola.error("fetch", url, r.status, r.statusText);
       return null;
     }
     const ab = await r.arrayBuffer();
@@ -123,7 +124,7 @@ export function loadTranslations(locale) {
     const data = readFileSync(path.join(import.meta.dirname, "..", "locales", `${filename}.json`), "utf-8");
     translations = JSON.parse(data);
   } catch (err) {
-    console.error("cannot load translations", locale);
+    consola.error("cannot load translations", locale);
   }
   return translations;
 }
@@ -140,7 +141,7 @@ export function loadConfig() {
         return defaultValue;
       },
     };
-    console.log("err", err);
+    consola.warn("config error", err);
     configError = err;
   }
   return { config, configError };
