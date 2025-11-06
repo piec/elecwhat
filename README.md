@@ -1,4 +1,4 @@
-# ElecWhat - Simple desktop Whatsapp client for Linux
+# ElecWhat - Simple desktop WhatsApp client for Linux
 <p align="center">
 <img width="400" alt="elecwhat" src="https://github.com/user-attachments/assets/3a352d5b-04a8-4e90-a063-330b706d096c" />
 </p>
@@ -10,16 +10,17 @@
 * Custom CSS
 * Spellcheck
 * CLI & D-Bus interface to show/hide/toggle window
-* Very stable, I have been running it for 6+ month without crash/freeze
+* Dock unread count badge 
+* Very stable, I have been running it for 1+ year without crash/freeze
 * Can be trusted:
-  * Code easy to review - <600 lines of code currently
+  * Code easy to review - ~800 lines of code currently
   * Automatically built by GitHub Actions (CI)
 * Preserve window position
 * Custom user scripts in `~/.config/elecwhat/user-scripts/*.js`
 * Custom tray icons in `~/.config/elecwhat/user-icons/*.png` by default
 
 ## Why?
-I created this client after due to recurrent stability issues with [WhatSie](https://github.com/keshavbhatt/whatsie).
+I created this client after due to recurrent stability issues with other linux clients.
 Also I just wanted a simple and stable client and thought it could be done without much code with electron.
 
 ## Install
@@ -55,6 +56,7 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
 (or for snap: `~/snap/elecwhat/current/.config/elecwhat/config.json`)
 ```
 {
+  "log-level": "info",
   "notification-prefix": "elecwhat - ",
 
   "quit-on-close": false,
@@ -70,6 +72,7 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
       "whatsappAction": "GO_TO_NEXT_CHAT"
     }
   },
+  "esc-toggle-window": true,
 
   "css": [
     "span { font-size: small !important; }",
@@ -87,8 +90,17 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
     # ~/.config/elecwhat/user-scripts/myscript.js
     "${userData}/user-scripts/myscripts.js"
   ],
+  "icons-directory": "..."
 }
 ```
+
+## Custom icons
+
+The naming scheme is based on WhatsApp Web favicon urls:
+* `~/.config/elecwhat/user-icons/app.png` during startup
+* `~/.config/elecwhat/user-icons/favicon.png` when there is no unread
+* `~/.config/elecwhat/user-icons/f01.png` where fXX.png is the number of unread
+
 
 ## Not planed
 * Multi account
