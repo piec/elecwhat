@@ -78,7 +78,8 @@ export class Dbus {
     // gnome dash-to-dock: https://github.com/micheleg/dash-to-dock/blob/b96a003bec758fc35efb0f4e5134030a921c418b/launcherAPI.js#L14-L21
     // kde plasma: https://github.com/KDE/plasma-desktop/commit/e284e9dc17051f22d05985e218fa44ddaba78de5
     const hint = process.env.BAMF_DESKTOP_FILE_HINT;
-    const desktopFile = hint ? path.basename(hint) : "elecwhat.desktop";
+    const snap = process.env.SNAP;
+    const desktopFile = hint ? path.basename(hint) : snap ? "elecwhat_elecwhat.desktop" : "elecwhat.desktop";
     this.sessionBus?.connection.message({
       type: dbus.messageType.signal,
       serial: ++this.serialCounter,
