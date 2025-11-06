@@ -148,15 +148,12 @@ function main() {
           event.preventDefault();
           closeChat();
           mainWindow.hide();
-          // event.returnValue = false;
         }
       }
     });
 
-    let dbus;
     app.on("before-quit", function () {
       consola.debug("before-quit");
-      dbus?.end();
       app.isQuiting = true;
     });
 
@@ -175,6 +172,7 @@ function main() {
           app.quit();
         }
       }
+      let dbus;
       if (config.get("dbus", true)) {
         dbus = new Dbus(mainWindow);
       }
