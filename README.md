@@ -1,4 +1,7 @@
 # ElecWhat - Simple desktop Whatsapp client for Linux
+<p align="center">
+<img width="400" alt="elecwhat" src="https://github.com/user-attachments/assets/3a352d5b-04a8-4e90-a063-330b706d096c" />
+</p>
 
 ## Features
 * Desktop notifications
