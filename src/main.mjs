@@ -25,7 +25,7 @@ import { defaultKeys } from "./keys.mjs";
 import { Dbus } from "./dbus.mjs";
 
 const defaultUserAgent =
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36";
 
 function main() {
   let { config, configError } = loadConfig();
@@ -87,6 +87,13 @@ function main() {
     if (isDebug || config.get("open-dev-tools", false)) {
       mainWindow.webContents.openDevTools();
     }
+
+    // Log console messages from WhatsApp Web to help diagnose issues
+    mainWindow.webContents.on("console-message", (event, level, message, line, sourceId) => {
+      const levelMap = ["debug", "info", "warn", "error"];
+      const logLevel = levelMap[level] || "log";
+      consola[logLevel](`[WhatsApp Web] ${message}`);
+    });
 
     // Sets the spellchecker langs
     const preferredLangs = app.getPreferredSystemLanguages();
