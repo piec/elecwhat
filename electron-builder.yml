@@ -15,6 +15,10 @@ linux:
 
     # - flatpak
 
+  # Register as handler for whatsapp:// protocol links (issue #20)
+  mimeTypes:
+    - x-scheme-handler/whatsapp
+
 publish:
   - github
 

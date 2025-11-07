@@ -27,6 +27,41 @@ import { Dbus } from "./dbus.mjs";
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
+/**
+ * Converts a whatsapp:// protocol URL to a web.whatsapp.com URL
+ * @param {string} url - The whatsapp:// URL to convert
+ * @returns {string|null} - The converted URL or null if invalid
+ */
+function convertWhatsAppUrl(url) {
+  try {
+    if (!url.startsWith("whatsapp://")) {
+      return null;
+    }
+    // Convert whatsapp://send/?... to https://web.whatsapp.com/send?...
+    const whatsappUrl = new URL(url);
+    const webUrl = `https://web.whatsapp.com${whatsappUrl.pathname}${whatsappUrl.search}${whatsappUrl.hash}`;
+    consola.info("Converting whatsapp:// URL:", url, "->", webUrl);
+    return webUrl;
+  } catch (err) {
+    consola.error("Failed to convert whatsapp URL:", url, err);
+    return null;
+  }
+}
+
+/**
+ * Handles a whatsapp:// protocol URL by navigating to it in the app
+ * @param {BrowserWindow} window - The main window
+ * @param {string} url - The whatsapp:// URL to handle
+ */
+function handleWhatsAppProtocol(window, url) {
+  const webUrl = convertWhatsAppUrl(url);
+  if (webUrl) {
+    consola.info("Loading WhatsApp URL:", webUrl);
+    windowShow(window);
+    window.webContents.loadURL(webUrl);
+  }
+}
+
 function main() {
   let { config, configError } = loadConfig();
 
@@ -37,6 +72,12 @@ function main() {
   consola.level = LogLevels[logLevelStr] ?? 3;
 
   consola.info("config file", config.file);
+
+  // Register as default protocol client for whatsapp:// URLs (issue #20)
+  if (!app.isDefaultProtocolClient("whatsapp")) {
+    consola.info("Registering as default protocol client for whatsapp://");
+    app.setAsDefaultProtocolClient("whatsapp");
+  }
 
   const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
   const persistState = factory(persistStateFileName, "state", { prettyJson: { enabled: true } });
@@ -345,6 +386,13 @@ function main() {
   app.whenReady().then(async () => {
     let window = await createWindow();
 
+    // Check if app was launched with a whatsapp:// URL (issue #20)
+    const whatsappUrl = process.argv.find((arg) => arg.startsWith("whatsapp://"));
+    if (whatsappUrl) {
+      consola.info("App launched with whatsapp:// URL:", whatsappUrl);
+      handleWhatsAppProtocol(window, whatsappUrl);
+    }
+
     addAboutMenuItem();
     app.on("activate", async () => {
       // On macOS it's common to re-create a window in the app when the
@@ -358,6 +406,13 @@ function main() {
       consola.debug("second-instance", additionalData, commandLine);
 
       if (window) {
+        // Check for whatsapp:// protocol URLs (issue #20)
+        const whatsappUrl = commandLine.find((arg) => arg.startsWith("whatsapp://"));
+        if (whatsappUrl) {
+          handleWhatsAppProtocol(window, whatsappUrl);
+          return;
+        }
+
         if (commandLine.includes("--hide")) {
           window.hide();
         } else if (commandLine.includes("--toggle")) {
@@ -372,6 +427,15 @@ function main() {
           // --show
           windowShow(window);
         }
+      }
+    });
+
+    // Handle whatsapp:// protocol URLs on macOS and some Linux DEs (issue #20)
+    app.on("open-url", (event, url) => {
+      event.preventDefault();
+      consola.debug("open-url", url);
+      if (url.startsWith("whatsapp://")) {
+        handleWhatsAppProtocol(window, url);
       }
     });
   });
