@@ -10,7 +10,7 @@
 * Custom CSS
 * Spellcheck
 * CLI & D-Bus interface to show/hide/toggle window
-* Dock unread count badge 
+* Dock unread count badge
 * Very stable, I have been running it for 1+ year without crash/freeze
 * Can be trusted:
   * Code easy to review - ~800 lines of code currently
@@ -72,7 +72,7 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
       "whatsappAction": "GO_TO_NEXT_CHAT"
     }
   },
-  "esc-toggle-window": true,
+  "esc-toggle-window": false,
 
   "css": [
     "span { font-size: small !important; }",

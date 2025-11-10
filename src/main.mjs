@@ -45,7 +45,7 @@ function main() {
   const state = {
     notifPrefix: config.get("notification-prefix", ""),
     showAtStartup: isDebug || config.get("show-at-startup", true),
-    escToggle: config.get("esc-toggle-window", true),
+    escToggle: config.get("esc-toggle-window", false),
     get windowBounds() {
       const bounds = persistState.get("window-bounds", { width: 1099, height: 800 });
       if (isDebug) {
