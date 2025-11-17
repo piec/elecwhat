@@ -68,11 +68,12 @@ async function ewSetupKeys() {
 
   console.debug("keys", keys);
 
-  function doAction(effect) {
-    ({
+  async function doAction(effect) {
+    await {
       OPEN_NTH_CHAT: (effect) => openNthChat(effect.chatIndex),
-      // TODO Add more custom actions
-    })[effect.action]?.(effect);
+      SLEEP: async (effect) => new Promise((resolve) => setTimeout(resolve, effect.duration)),
+      IPC: async (effect) => window?.ipc?.[effect.method]?.(...(effect.args ?? [])),
+    }[effect.action]?.(effect);
   }
 
   function openNthChat(chatIndex) {
