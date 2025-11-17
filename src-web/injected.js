@@ -93,7 +93,25 @@ async function ewSetupKeys() {
     }
   }
 
-  addEventListener("keydown", (ev) => {
+  async function executeEffect(effect) {
+    if (typeof effect?.whatsappAction === "string") {
+      ewDoWhatsappAction(effect.whatsappAction);
+    } else if (typeof effect?.action === "string") {
+      await doAction(effect);
+    }
+  }
+
+  // single effect (dict) or array of effects
+  async function executeEffects(effects) {
+    const effectsArray = Array.isArray(effects) ? effects : [effects];
+
+    for (let i = 0; i < effectsArray.length; i++) {
+      console.log("executeEffect", effectsArray[i]);
+      await executeEffect(effectsArray[i]);
+    }
+  }
+
+  addEventListener("keydown", async (ev) => {
     for (let [binding, effect] of Object.entries(keys)) {
       const parsed = parseBinding(binding);
       let match = true;
@@ -102,11 +120,7 @@ async function ewSetupKeys() {
       }
       if (match) {
         console.log("effect", effect);
-        if (typeof effect?.whatsappAction === "string") {
-          ewDoWhatsappAction(effect.whatsappAction);
-        } else if (typeof effect?.action === "string") {
-          doAction(effect);
-        }
+        await executeEffects(effect);
       }
     }
   });
