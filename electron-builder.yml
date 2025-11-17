@@ -12,7 +12,7 @@ linux:
     - tar.xz
 
     # - flatpak
-  category: "Network;Chat;InstantMessaging;WhatsApp;"
+  category: "Network;Chat;InstantMessaging;X-WhatsApp;"
   desktop:
     entry:
       Name: ElecWhat
