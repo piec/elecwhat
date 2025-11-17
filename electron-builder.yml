@@ -1,6 +1,4 @@
 appId: "fr.carru.elecwhat"
-mac:
-  category: "public.app-category.social-networking"
 
 linux:
   # https://www.electron.build/app-builder-lib.interface.linuxconfiguration#target
@@ -14,6 +12,12 @@ linux:
     - tar.xz
 
     # - flatpak
+  category: "Network;Chat;InstantMessaging;WhatsApp;"
+  desktop:
+    entry:
+      Name: ElecWhat
+      GenericName: WhatsApp Client
+      Comment: Simple WhatsApp client
 
 publish:
   - github
