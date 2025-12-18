@@ -107,6 +107,7 @@ function main() {
     const lang = preferredLangs[0];
     const translations = loadTranslations(lang);
 
+
     contextMenu({
       showSelectAll: false,
       showSaveImageAs: true,

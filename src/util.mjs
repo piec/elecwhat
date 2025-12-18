@@ -121,12 +121,23 @@ export function loadTranslations(locale) {
   let translations = {};
   try {
     const filename = locale.split("-")[0];
-    const data = readFileSync(path.join(import.meta.dirname, "..", "locales", `${filename}.json`), "utf-8");
+    const data = tryLoadFile(filename) || tryLoadFile("en");
+    console.log("DATA", data);
     translations = JSON.parse(data);
   } catch (err) {
     consola.error("cannot load translations", locale);
   }
   return translations;
+}
+
+export function tryLoadFile(name) {
+  const localesDir = path.join(import.meta.dirname, "..", "locales");
+  const filePath = path.join(localesDir, `${name}.json`);
+  try {
+    return readFileSync(filePath, "utf-8");
+  } catch {
+    return null;
+  }
 }
 
 export function loadConfig() {
