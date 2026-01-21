@@ -124,7 +124,7 @@ export function loadTranslations(locale) {
     const data = readFileSync(path.join(import.meta.dirname, "..", "locales", `${filename}.json`), "utf-8");
     translations = JSON.parse(data);
   } catch (err) {
-    consola.error("cannot load translations", locale);
+    consola.warn("cannot load translations", locale);
   }
   return translations;
 }
