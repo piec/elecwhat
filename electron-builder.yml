@@ -19,6 +19,10 @@ linux:
       GenericName: WhatsApp Client
       Comment: Simple WhatsApp client
 
+  # Register "whatsapp:" url scheme
+  mimeTypes:
+    - x-scheme-handler/whatsapp
+
 publish:
   - github
 

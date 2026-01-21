@@ -14,6 +14,8 @@ import {
   loadTranslations,
   loadConfig,
   getUnreadCountFromFavicon,
+  convertWhatsAppUrl,
+  urlScheme,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -23,9 +25,20 @@ import pkg from "../package.json" with { type: "json" };
 import { factory } from "electron-json-config";
 import { defaultKeys } from "./keys.mjs";
 import { Dbus } from "./dbus.mjs";
+import { url } from "node:inspector";
 
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+
+function handleWhatsAppProtocol(window, url) {
+  const webUrl = convertWhatsAppUrl(url);
+  if (webUrl) {
+    consola.info("Loading WhatsApp URL:", webUrl);
+    windowShow(window);
+    // is there a way to pass it to the webapp without reloading?
+    window.webContents.loadURL(webUrl);
+  }
+}
 
 function main() {
   let { config, configError } = loadConfig();
@@ -86,6 +99,11 @@ function main() {
 
     if (isDebug || config.get("open-dev-tools", false)) {
       mainWindow.webContents.openDevTools();
+    }
+
+    if (config.get("register-url-scheme", true) && !app.isDefaultProtocolClient(urlScheme)) {
+      consola.info(`Registering as default protocol client for ${urlScheme}://`);
+      app.setAsDefaultProtocolClient(urlScheme);
     }
 
     // Sets the spellchecker langs
@@ -345,6 +363,12 @@ function main() {
   app.whenReady().then(async () => {
     let window = await createWindow();
 
+    // Check if app was launched with a whatsapp: URL scheme
+    const whatsappUrl = process.argv.find((arg) => arg.startsWith(`${urlScheme}:`));
+    if (whatsappUrl) {
+      handleWhatsAppProtocol(window, whatsappUrl);
+    }
+
     addAboutMenuItem();
     app.on("activate", async () => {
       // On macOS it's common to re-create a window in the app when the
@@ -358,6 +382,13 @@ function main() {
       consola.debug("second-instance", additionalData, commandLine);
 
       if (window) {
+        // Check for whatsapp: protocol URLs
+        const whatsappUrl = commandLine.find((arg) => arg.startsWith(`${urlScheme}:`));
+        if (whatsappUrl) {
+          handleWhatsAppProtocol(window, whatsappUrl);
+          return;
+        }
+
         if (commandLine.includes("--hide")) {
           window.hide();
         } else if (commandLine.includes("--toggle")) {

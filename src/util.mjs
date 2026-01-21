@@ -151,3 +151,21 @@ export function getUnreadCountFromFavicon(faviconUrl) {
   const match = faviconUrl.match(/https:\/\/web\.whatsapp\.com\/favicon\/1x\/f(\d+)\//);
   return match ? parseInt(match[1], 10) : 0;
 }
+
+export const urlScheme = "whatsapp";
+export function convertWhatsAppUrl(url) {
+  try {
+    if (!url.startsWith(`${urlScheme}:`)) {
+      return null;
+    }
+    // Convert whatsapp://send/?... to https://web.whatsapp.com/send?...
+    // "send" is parsed as the hostname, not the path
+    const whatsappUrl = new URL(url);
+    const webUrl = `https://web.whatsapp.com/${whatsappUrl.hostname}${whatsappUrl.pathname}${whatsappUrl.search}${whatsappUrl.hash}`;
+    consola.info("Converting whatsapp:// URL:", url, "->", webUrl);
+    return webUrl;
+  } catch (err) {
+    consola.error("Failed to convert whatsapp URL:", url, err);
+    return null;
+  }
+}
