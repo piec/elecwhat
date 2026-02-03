@@ -95,6 +95,8 @@ export function getUserIcon(url, state) {
   return null;
 }
 
+const iconCache = new Map();
+
 export async function getIcon(url, state) {
   const userIcon = getUserIcon(url, state);
   if (userIcon) {
@@ -103,6 +105,10 @@ export async function getIcon(url, state) {
 
   // larger images
   url = url.replace("/1x/", "/2x/");
+
+  if (iconCache.has(url)) {
+    return iconCache.get(url);
+  }
   const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
 
   consola.debug("url", url);
@@ -121,10 +127,13 @@ export async function getIcon(url, state) {
       r.headers.get("content-type")?.includes("image/webp") ||
       (buffer.length >= 12 && buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP");
     if (isWebp) {
-      consola.debug("convert webp");
+      consola.debug("convert webp", url);
       buffer = await sharp(buffer).png().toBuffer();
     }
-    return nativeImage.createFromBuffer(buffer);
+    const image = nativeImage.createFromBuffer(buffer);
+    consola.debug("nativeImage size", image.getSize());
+    iconCache.set(url, image);
+    return image;
   }
 }
 
