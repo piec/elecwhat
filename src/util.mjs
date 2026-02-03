@@ -3,6 +3,7 @@ import { factory } from "electron-json-config";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { consola } from "consola";
+import sharp from "sharp";
 
 export const toggleVisibility = function (window) {
   consola.debug("toggleVisibility");
@@ -104,6 +105,7 @@ export async function getIcon(url, state) {
   url = url.replace("/1x/", "/2x/");
   const re = /https:\/\/(static\.whatsapp\.net|web\.whatsapp\.com)\//;
 
+  consola.debug("url", url);
   if (url && re.test(url)) {
     const r = await fetch(url, {
       headers: { "User-Agent": state.userAgent },
@@ -113,7 +115,16 @@ export async function getIcon(url, state) {
       return null;
     }
     const ab = await r.arrayBuffer();
-    return nativeImage.createFromBuffer(Buffer.from(ab));
+    let buffer = Buffer.from(ab);
+    const isWebp =
+      url.endsWith(".webp") ||
+      r.headers.get("content-type")?.includes("image/webp") ||
+      (buffer.length >= 12 && buffer.toString("ascii", 0, 4) === "RIFF" && buffer.toString("ascii", 8, 12) === "WEBP");
+    if (isWebp) {
+      consola.debug("convert webp");
+      buffer = await sharp(buffer).png().toBuffer();
+    }
+    return nativeImage.createFromBuffer(buffer);
   }
 }
 
