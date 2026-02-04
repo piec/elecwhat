@@ -1,5 +1,11 @@
 appId: "fr.carru.elecwhat"
 
+# https://sharp.pixelplumbing.com/install/#electron-builder
+asar: true
+asarUnpack:
+  - "**/node_modules/sharp/**/*"
+  - "**/node_modules/@img/**/*"
+
 linux:
   # https://www.electron.build/app-builder-lib.interface.linuxconfiguration#target
   # AppImage, flatpak, snap, deb, rpm, freebsd, pacman, p5p, apk, 7z, zip, tar.xz, tar.lz, tar.gz, tar.bz2, dir.
