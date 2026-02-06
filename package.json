@@ -21,15 +21,15 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^37.4.0",
-    "electron-builder": "^26.0.12",
-    "prettier": "^3.6.2"
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0",
+    "prettier": "^3.8.1"
   },
   "dependencies": {
     "@homebridge/dbus-native": "^0.7.2",
     "consola": "^3.4.2",
     "electron-context-menu": "^4.1.1",
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.23",
     "sharp": "^0.34.5"
   }
 }
