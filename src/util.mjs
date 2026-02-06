@@ -1,5 +1,5 @@
 import { Menu, MenuItem, app, nativeImage, net } from "electron";
-import { factory } from "electron-json-config";
+import { JsonConfig } from "./json-config.mjs";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { consola } from "consola";
@@ -147,24 +147,6 @@ export function loadTranslations(locale) {
     consola.warn("cannot load translations", locale);
   }
   return translations;
-}
-
-export function loadConfig() {
-  const file = path.join(app.getPath("userData"), "config.json");
-  let config, configError;
-  try {
-    config = factory(file, undefined, { prettyJson: { enabled: true } });
-  } catch (err) {
-    config = {
-      file: file,
-      get: (name, defaultValue) => {
-        return defaultValue;
-      },
-    };
-    consola.warn("config error", err);
-    configError = err;
-  }
-  return { config, configError };
 }
 
 export function getUnreadCountFromFavicon(faviconUrl) {

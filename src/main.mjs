@@ -12,7 +12,6 @@ import {
   getIcon,
   getUserIcon,
   loadTranslations,
-  loadConfig,
   getUnreadCountFromFavicon,
   convertWhatsAppUrl,
   urlScheme,
@@ -22,10 +21,9 @@ import { debounce } from "lodash-es";
 import { consola, LogLevels } from "consola";
 
 import pkg from "../package.json" with { type: "json" };
-import { factory } from "electron-json-config";
+import { JsonConfig } from "./json-config.mjs";
 import { defaultKeys } from "./keys.mjs";
 import { Dbus } from "./dbus.mjs";
-import { url } from "node:inspector";
 
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
@@ -41,7 +39,7 @@ function handleWhatsAppProtocol(window, url) {
 }
 
 function main() {
-  let { config, configError } = loadConfig();
+  const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
 
   // Configure log level: CLI option takes priority over config option
   const cliLogLevel = process.argv.find((arg) => arg.startsWith("--log-level="))?.split("=")[1];
@@ -52,7 +50,7 @@ function main() {
   consola.info("config file", config.file);
 
   const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
-  const persistState = factory(persistStateFileName, "state", { prettyJson: { enabled: true } });
+  const persistState = new JsonConfig(persistStateFileName);
   consola.info("state file", persistState.file);
 
   const state = {
@@ -176,7 +174,7 @@ function main() {
     });
 
     app.whenReady().then(() => {
-      if (configError) {
+      if (config.parseError) {
         const res = dialog.showMessageBoxSync({
           type: "error",
           buttons: [
@@ -184,7 +182,7 @@ function main() {
             translations?.config_quit ?? "Quit",
           ],
           title: translations?.config_title ?? "Configuration file",
-          message: config.file + ":\n\n" + configError,
+          message: config.file + ":\n\n" + config.parseError,
         });
         if (res === 1) {
           app.quit();
