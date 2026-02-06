@@ -7,7 +7,7 @@
     "url": "https://github.com/piec"
   },
   "homepage": "https://github.com/piec/elecwhat",
-  "version": "1.13.3",
+  "version": "1.13.4",
   "main": "src/main.mjs",
   "type": "module",
   "scripts": {
