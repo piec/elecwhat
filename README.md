@@ -68,6 +68,8 @@ If you use Gnome, I recommend using this [AppIndicator] extension in order to sh
   "menu-bar": true,
   "menu-bar-auto-hide": true,
 
+  "autostart": false,
+
   "keys": {
     "C ArrowDown": {
       "whatsappAction": "GO_TO_NEXT_CHAT"

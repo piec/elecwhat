@@ -1,5 +1,5 @@
 import { app, BrowserWindow, session, Menu, Tray, ipcMain, shell, Notification, dialog } from "electron";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import {
   addAboutMenuItem,
@@ -38,8 +38,52 @@ function handleWhatsAppProtocol(window, url) {
   }
 }
 
+/**
+ *
+ * @param {boolean} enabled Whenever to enable or disable autostart
+ */
+function setAutostart(enabled) {
+  if (process.platform !== "linux") {
+    return;
+  }
+
+  function getLinuxAutostartPath() {
+    return path.join(app.getPath("appData"), "autostart");
+  }
+
+  const autostartDir = getLinuxAutostartPath();
+  const autostartFile = path.join(autostartDir, `${pkg.name}.desktop`);
+
+  if (!enabled) {
+    rmSync(autostartFile, { force: true });
+    return;
+  }
+
+  mkdirSync(autostartDir, { recursive: true });
+
+  const quoteArg = (arg) => `"${String(arg).replaceAll('"', '\\"')}"`;
+  const appRoot = path.resolve(import.meta.dirname, "..");
+  const execParts = app.isPackaged
+    ? [app.getPath("exe"), "--hide", "--autostart"]
+    : [app.getPath("exe"), appRoot, "--hide", "--autostart"];
+  const exec = execParts.map(quoteArg).join(" ");
+  const desktopEntry = [
+    "[Desktop Entry]",
+    "Type=Application",
+    "Version=1.0",
+    `Name=${pkg.name}`,
+    `Comment=${pkg.description}`,
+    `Exec=${exec}`,
+    "Terminal=false",
+    "X-GNOME-Autostart-enabled=true",
+  ].join("\n");
+  writeFileSync(autostartFile, desktopEntry + "\n", "utf-8");
+}
+
 function main() {
   const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
+  const startHidden = process.argv.includes("--hide");
+  const startFromAutostart = process.argv.includes("--autostart");
 
   // Configure log level: CLI option takes priority over config option
   const cliLogLevel = process.argv.find((arg) => arg.startsWith("--log-level="))?.split("=")[1];
@@ -77,6 +121,9 @@ function main() {
 
   if (config.get("quit-on-close", false)) {
     state.showAtStartup = true;
+  }
+  if (startHidden) {
+    state.showAtStartup = false;
   }
 
   const createWindow = async () => {
@@ -359,6 +406,12 @@ function main() {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(async () => {
+    const autostartEnabled = config.get("autostart", false);
+    setAutostart(autostartEnabled);
+    if (startFromAutostart && !autostartEnabled) {
+      app.quit();
+      return;
+    }
     let window = await createWindow();
 
     // Check if app was launched with a whatsapp: URL scheme
