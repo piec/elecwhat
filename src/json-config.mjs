@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { consola } from "consola";
+import { parse as parseJsonc, printParseErrorCode } from "jsonc-parser";
 
 export class JsonConfig {
   #filePath;
@@ -36,12 +37,18 @@ export class JsonConfig {
       return;
     }
 
-    try {
-      this.#data = JSON.parse(readFileSync(this.#filePath, "utf-8"));
-    } catch (err) {
-      this.#parseError = err;
-      consola.warn(`Config parse error in ${this.#filePath}:`, err.message);
+    const errors = [];
+    const parsed = parseJsonc(readFileSync(this.#filePath, "utf-8"), errors, {
+      allowTrailingComma: true,
+    });
+
+    if (errors.length > 0) {
+      const [{ error, offset }] = errors;
+      this.#parseError = new Error(`${printParseErrorCode(error)} at offset ${offset}`);
+      consola.warn(`Config parse error in ${this.#filePath}:`, this.#parseError.message);
       this.#data = { ...defaultData };
+    } else {
+      this.#data = parsed ?? { ...defaultData };
     }
   }
 
