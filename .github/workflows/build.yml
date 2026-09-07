@@ -39,6 +39,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
+      - name: Print SHA256 digests of built files
+        run: find ./dist -maxdepth 1 -type f | sort | xargs sha256sum
+
       - env:
           BUILDKITE_TOKEN: ${{ secrets.BUILDKITE_TOKEN }}
         run: |
