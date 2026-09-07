@@ -350,7 +350,7 @@ function main() {
 
   app.setAboutPanelOptions({
     applicationName: pkg.name,
-    applicationVersion: app.getVersion(),
+    applicationVersion: `${app.getVersion()} (electronjs ${process.versions.electron})`,
     authors: [pkg?.author?.name],
     website: pkg?.homepage,
     // iconPath: "static/app.png", does not work when packaged
