@@ -39,6 +39,7 @@ function handleWhatsAppProtocol(window, url) {
 }
 
 function main() {
+  consola.info("electron", process.versions.electron);
   const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
 
   // Configure log level: CLI option takes priority over config option
