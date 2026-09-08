@@ -1,5 +1,17 @@
 appId: "fr.carru.elecwhat"
 
+# Without an explicit allowlist, electron-builder packs the whole project
+# root into app.asar by default — including dotfiles like .vscode/ and
+# .claude/, and any stray untracked files that happen to be sitting there
+# (this is how a leftover dev-machine elecwhat.desktop and a whole
+# usr/share/applications/ tree ended up shipped inside the app).
+files:
+  - src/**/*
+  - src-web/**/*
+  - static/**/*
+  - locales/**/*
+  - package.json
+
 # https://sharp.pixelplumbing.com/install/#electron-builder
 asar: true
 asarUnpack:
