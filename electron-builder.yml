@@ -19,6 +19,12 @@ asarUnpack:
   - "**/node_modules/@img/**/*"
 
 linux:
+  # Electron uses desktopName (set in package.json) as its app_id/WM_CLASS;
+  # this makes the generated .desktop file's basename match it too, so
+  # desktop environments can associate running windows with the launcher
+  # entry (taskbar/alt-tab/window-frame icon).
+  # https://www.electron.build/linux#window-association-desktopname--syncdesktopname
+  syncDesktopName: true
   # https://www.electron.build/app-builder-lib.interface.linuxconfiguration#target
   # AppImage, flatpak, snap, deb, rpm, freebsd, pacman, p5p, apk, 7z, zip, tar.xz, tar.lz, tar.gz, tar.bz2, dir.
   target:
