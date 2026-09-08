@@ -65,6 +65,5 @@ snapcraft:
       # upower-observe:
 
       # additional
-      dbus:
       pulseaudio:
       audio-record:
