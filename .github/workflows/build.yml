@@ -42,6 +42,16 @@ jobs:
           sudo lxd init --auto
           sudo usermod -a -G lxd "$USER"
 
+          # GitHub Actions runners have Docker pre-installed, and Docker's
+          # DOCKER-USER iptables chain drops forwarded traffic on *other*
+          # bridges (like lxdbr0) by default — the LXD VM snapcraft launches
+          # then has no network access to fetch/build anything.
+          # https://documentation.ubuntu.com/lxd/en/latest/howto/network_bridge_firewalld/
+          sudo iptables  -I DOCKER-USER -i lxdbr0 -j ACCEPT
+          sudo ip6tables -I DOCKER-USER -i lxdbr0 -j ACCEPT
+          sudo iptables  -I DOCKER-USER -o lxdbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+          sudo ip6tables -I DOCKER-USER -o lxdbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
       - run: npm ci
       # dist
       - run: sg lxd -c "npm run release"
