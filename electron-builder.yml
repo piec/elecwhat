@@ -32,39 +32,39 @@ linux:
 publish:
   - github
 
-snap:
-  title: ElecWhat
-  description: |
-    Simple Whatsapp client for linux
-  publish:
-    - github
-    - snapStore
-  slots:
-    dbus-svc:
-      interface: dbus
-      bus: session
-      name: "fr.carru.elecwhat"
-  plugs:
-    # Electron app from https://snapcraft.io/docs/desktop-interfaces
-    desktop:
-    desktop-legacy:
-    wayland:
-    unity7:
-    # alsa:
-    # avahi-observe:
-    browser-support:
-    camera:
-    # cups-control:
-    gsettings:
-    home:
-    network:
-    opengl:
-    audio-playback:
-    # screen-inhibit-control:
-    # upower-observe:
+snapcraft:
+  base: core24
+  core24:
+    title: ElecWhat
+    description: |
+      Simple Whatsapp client for linux
+    # snapcraft CLI needs an isolated build env; multipass is installed in CI
+    useMultipass: true
+    publish:
+      - github
+      - snapStore
+    slots:
+      dbus-svc:
+        interface: dbus
+        bus: session
+        name: "fr.carru.elecwhat"
+    plugs:
+      # The "gnome" extension (default on core24) already supplies:
+      # desktop, desktop-legacy, gsettings, opengl, wayland, x11
+      # and wires up the modern gnome-46-2404 / mesa-2404 content snaps.
+      unity7:
+      # alsa:
+      # avahi-observe:
+      browser-support:
+      camera:
+      # cups-control:
+      home:
+      network:
+      audio-playback:
+      # screen-inhibit-control:
+      # upower-observe:
 
-    # additional
-    dbus:
-    x11:
-    pulseaudio:
-    audio-record:
+      # additional
+      dbus:
+      pulseaudio:
+      audio-record:
