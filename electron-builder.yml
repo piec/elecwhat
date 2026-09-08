@@ -38,8 +38,13 @@ snapcraft:
     title: ElecWhat
     description: |
       Simple Whatsapp client for linux
-    # snapcraft CLI needs an isolated build env; multipass is installed in CI
-    useMultipass: true
+    # snapcraft CLI needs an isolated build env. LXD, not multipass: multipass's
+    # build socket permissions don't take effect within a single CI job (group
+    # membership is only refreshed on a fresh login) — a long-standing,
+    # unresolved issue (https://github.com/canonical/multipass/issues/1075).
+    # CI works around the same "needs a fresh login" problem for LXD's own
+    # group by wrapping the build command in `sg lxd -c '...'` (see build.yml).
+    useLXD: true
     publish:
       - github
       - snapStore

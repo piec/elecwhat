@@ -30,11 +30,21 @@ jobs:
 
       - run: sudo apt install -y libarchive-tools
       - run: sudo snap install snapcraft --classic
-      - run: sudo snap install multipass --beta --classic
+
+      # snapcraft needs an isolated build env; LXD, not multipass (multipass's
+      # socket permissions don't take effect within a single CI job — see
+      # electron-builder.yml). `sg lxd` below runs the build with the lxd
+      # group active without needing a fresh login.
+      - name: Set up LXD
+        run: |
+          sudo snap install lxd
+          sudo lxd waitready
+          sudo lxd init --auto
+          sudo usermod -a -G lxd "$USER"
 
       - run: npm ci
       # dist
-      - run: npm run release
+      - run: sg lxd -c "npm run release"
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
