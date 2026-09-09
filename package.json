@@ -22,7 +22,7 @@
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^44.2.0",
+    "electron": "^42.11.3",
     "electron-builder": "^26.15.7",
     "prettier": "^3.8.1"
   },
