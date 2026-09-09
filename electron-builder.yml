@@ -42,6 +42,9 @@ linux:
       Name: ElecWhat
       GenericName: WhatsApp Client
       Comment: Simple WhatsApp client
+      # Prevent GNOME Shell context menu "New Window"
+      SingleMainWindow: "true"
+
 
   # Register "whatsapp:" url scheme
   mimeTypes:
