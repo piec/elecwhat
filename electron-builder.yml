@@ -66,6 +66,7 @@ snapcraft:
     # CI works around the same "needs a fresh login" problem for LXD's own
     # group by wrapping the build command in `sg lxd -c '...'` (see build.yml).
     useLXD: true
+    stagePackages: ["default", "libx11-xcb1"]
     publish:
       - github
       - snapStore
@@ -79,7 +80,7 @@ snapcraft:
       # desktop, desktop-legacy, gsettings, opengl, wayland, x11
       # and wires up the modern gnome-46-2404 / mesa-2404 content snaps.
       unity7:
-      # alsa:
+      alsa:
       # avahi-observe:
       browser-support:
       camera:
