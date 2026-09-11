@@ -15,6 +15,7 @@ import {
   getUnreadCountFromFavicon,
   convertWhatsAppUrl,
   urlScheme,
+  defaultQuitOnClose,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -76,7 +77,7 @@ function main() {
     },
   };
 
-  if (config.get("quit-on-close", false)) {
+  if (config.get("quit-on-close", defaultQuitOnClose)) {
     state.showAtStartup = true;
   }
 
@@ -157,7 +158,7 @@ function main() {
     });
 
     mainWindow.on("close", function (event) {
-      if (config.get("quit-on-close", false)) {
+      if (config.get("quit-on-close", defaultQuitOnClose)) {
         app.quit();
       } else {
         consola.debug(`close ${app.isQuiting}`);

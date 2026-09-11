@@ -18,6 +18,10 @@ export const toggleVisibility = function (window) {
 
 export const isDebug = process?.env?.DEBUG == 1;
 
+// GNOME Shell doesn't show a tray icon without a (rarely installed) extension,
+// so hiding to tray on close would leave the app with no way to reopen it.
+export const defaultQuitOnClose = (process?.env?.XDG_CURRENT_DESKTOP ?? "").toLowerCase().includes("gnome");
+
 export const addAboutMenuItem = () => {
   let menu = Menu.getApplicationMenu();
   if (menu == null || menu.items.length == 0) {
