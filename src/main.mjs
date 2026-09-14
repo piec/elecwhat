@@ -140,7 +140,7 @@ function main() {
     });
 
     const saveBounds = () => {
-      if (!isDebug) {
+      if (!isDebug && !mainWindow.isMinimized()) {
         persistState.set("window-bounds", mainWindow.getBounds());
       }
     };
