@@ -53,11 +53,15 @@ jobs:
           sudo ip6tables -I DOCKER-USER -o lxdbr0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 
       - run: npm ci
-      # dist
-      - run: sg lxd -c "npm run release"
+
+      - run: sg lxd -c "npx electron-builder --linux snap"
         env:
           GITHUB_TOKEN: ${{ github.token }}
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
+      - run: npx electron-builder --linux AppImage pacman deb rpm tar.xz
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
 
       - name: Print SHA256 digests of built files
         run: find ./dist -maxdepth 1 -type f | sort | xargs sha256sum
