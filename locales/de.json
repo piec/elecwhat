@@ -8,5 +8,6 @@
   "copyLink": "Link kopieren",
   "inspect": "Element untersuchen",
   "show_hide": "Anzeigen / Ausblenden",
+  "quit_on_close": "Beim Schließen beenden",
   "quit": "Beenden"
 }

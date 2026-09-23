@@ -223,6 +223,17 @@ function main() {
           },
         },
         {
+          label: translations?.quit_on_close ?? "Quit on close",
+          type: "checkbox",
+          checked: config.get("quit-on-close", defaultQuitOnClose),
+          click: (menuItem) => {
+            config.set("quit-on-close", menuItem.checked);
+            // Linux tray icons don't always redraw a toggled checkbox on their own.
+            tray.setContextMenu(trayContextMenu);
+          },
+        },
+        { type: "separator" },
+        {
           label: translations?.quit ?? "Quit",
           type: "normal",
           click: () => {
