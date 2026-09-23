@@ -18,12 +18,13 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "release": "electron-builder",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "patch-package && electron-builder install-app-deps"
   },
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "electron": "^42.11.3",
     "electron-builder": "^26.15.7",
+    "patch-package": "^8.0.1",
     "prettier": "^3.8.1"
   },
   "dependencies": {

@@ -1,0 +1,20 @@
+diff --git a/node_modules/app-builder-lib/out/targets/snap/core24.js b/node_modules/app-builder-lib/out/targets/snap/core24.js
+index accfaf3..28d25a9 100644
+--- a/node_modules/app-builder-lib/out/targets/snap/core24.js
++++ b/node_modules/app-builder-lib/out/targets/snap/core24.js
+@@ -269,7 +269,14 @@ class SnapCore24 extends SnapTarget_1.SnapCore {
+             plugs: appPlugs,
+             slots: appSlots,
+             autostart: options.autoStart ? `${desktopBaseName}.desktop` : undefined,
+-            desktop: `meta/gui/${desktopBaseName}.desktop`,
++            // Not setting `desktop` here: declaring it alongside the generated
++            // snap/gui/<name>.desktop file makes snapcraft treat them as two
++            // conflicting desktop-entry mechanisms and fail with "Failed to
++            // generate desktop file ... file does not exist" once snapcraft
++            // enforces this (see electron-builder PR #10176, merged upstream
++            // 2026-09-22 but not yet released). explicitly undefined so
++            // removeNullish strips it, same as command-chain above.
++            desktop: undefined,
+             extensions: resolvedExtensions,
+         };
+         // Icon path — build-time relative path so snapcraft can find the file in snap/gui/
