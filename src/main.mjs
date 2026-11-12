@@ -199,7 +199,12 @@ function main() {
         ipcMain.handle("ping", () => "pong");
       }
       ipcMain.handle("notifyEv", (ev, argsJson) => {
+        consola.debug("notifyev");
         windowShow(mainWindow);
+      });
+      ipcMain.handle("restore", (ev, argsJson) => {
+        consola.debug("restore");
+        mainWindow.restore();
       });
       ipcMain.handle("open", (ev, url) => {
         consola.debug("url", url);

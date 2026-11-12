@@ -13,6 +13,24 @@ if (window?.ipc?.debug) {
         console.log("click", ev);
       });
     },
+    notify1s: () => {
+      setTimeout(() => {
+        const n = new Notification("My notification");
+        n.addEventListener("click", (ev, o) => {
+          console.log("click", ev);
+        });
+      }, 1000);
+    },
+    raise1s: () => {
+      setTimeout(() => {
+        window.ipc.notifyEv();
+      }, 1000);
+    },
+    restore1s: () => {
+      setTimeout(() => {
+        window.ipc.restore();
+      }, 1000);
+    },
     but1: () => {
       console.log("but1");
     },
