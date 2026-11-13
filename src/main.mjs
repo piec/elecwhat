@@ -41,7 +41,9 @@ function handleWhatsAppProtocol(window, url) {
 
 function main() {
   consola.info("electron", process.versions.electron);
-  const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
+  // electron always sets this switch on linux, to the platform actually in use
+  const ozonePlatform = app.commandLine.getSwitchValue("ozone-platform");
+  consola.info("ozone platform", ozonePlatform);  const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
 
   // Configure log level: CLI option takes priority over config option
   const cliLogLevel = process.argv.find((arg) => arg.startsWith("--log-level="))?.split("=")[1];
@@ -368,7 +370,7 @@ function main() {
 
   app.setAboutPanelOptions({
     applicationName: pkg.name,
-    applicationVersion: `${app.getVersion()} (electronjs ${process.versions.electron})`,
+    applicationVersion: `${app.getVersion()} (electronjs ${process.versions.electron}${ozonePlatform ? `, ${ozonePlatform}` : ""})`,
     authors: [pkg?.author?.name],
     website: pkg?.homepage,
     // iconPath: "static/app.png", does not work when packaged
