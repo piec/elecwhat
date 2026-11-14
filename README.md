@@ -26,8 +26,6 @@ Also I just wanted a simple and stable client and thought it could be done witho
 
 ## Install
 
-If you use Gnome, I recommend using this [AppIndicator] extension in order to show tray icons
-
 ### Ubuntu/Kubuntu:
 * [Snap](https://snapcraft.io/elecwhat)
 * **or** [Buildkite deb] with `--no-sandbox` because of [issue]
