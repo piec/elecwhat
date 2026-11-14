@@ -18,6 +18,10 @@ asarUnpack:
   - "**/node_modules/sharp/**/*"
   - "**/node_modules/@img/**/*"
 
+# Linux: the electron binary is renamed to elecwhat.bin and build/linux-wrapper.sh
+# takes its place
+afterPack: build/after-pack.cjs
+
 linux:
   # Electron uses desktopName (set in package.json) as its app_id/WM_CLASS;
   # this makes the generated .desktop file's basename match it too, so
@@ -49,6 +53,14 @@ linux:
   # Register "whatsapp:" url scheme
   mimeTypes:
     - x-scheme-handler/whatsapp
+
+# AppArmor profile (Ubuntu 24+) must attach to elecwhat.bin, not to the wrapper script.
+deb:
+  appArmorProfile: build/apparmor-profile.tpl
+rpm:
+  appArmorProfile: build/apparmor-profile.tpl
+pacman:
+  appArmorProfile: build/apparmor-profile.tpl
 
 publish:
   - github
