@@ -43,7 +43,8 @@ function main() {
   consola.info("electron", process.versions.electron);
   // electron always sets this switch on linux, to the platform actually in use
   const ozonePlatform = app.commandLine.getSwitchValue("ozone-platform");
-  consola.info("ozone platform", ozonePlatform);  const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
+  consola.info("ozone platform", ozonePlatform);
+  const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
 
   // Configure log level: CLI option takes priority over config option
   const cliLogLevel = process.argv.find((arg) => arg.startsWith("--log-level="))?.split("=")[1];
@@ -157,7 +158,9 @@ function main() {
     mainWindow.on("resize", debounced);
     mainWindow.on("close", saveBounds);
     mainWindow.on("hide", () => {
-      closeChat();
+      if (config.get("close-chat-on-hide", true)) {
+        closeChat();
+      }
     });
 
     mainWindow.on("close", function (event) {
@@ -167,7 +170,9 @@ function main() {
         consola.debug(`close ${app.isQuiting}`);
         if (!app.isQuiting) {
           event.preventDefault();
-          closeChat();
+          if (config.get("close-chat-on-hide", true)) {
+            closeChat();
+          }
           mainWindow.hide();
         }
       }
