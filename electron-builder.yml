@@ -26,6 +26,8 @@ asar: true
 asarUnpack:
   - "**/node_modules/sharp/**/*"
   - "**/node_modules/@img/**/*"
+  # About window icon, read by GTK which can't read inside app.asar
+  - "static/app-512.png"
 
 # Linux: the electron binary is renamed to elecwhat.bin and build/linux-wrapper.sh
 # takes its place

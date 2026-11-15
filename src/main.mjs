@@ -417,7 +417,9 @@ function main() {
     applicationVersion: `${app.getVersion()} (electronjs ${process.versions.electron}${ozonePlatform ? `, ${ozonePlatform}` : ""})`,
     authors: [pkg?.author?.name],
     website: pkg?.homepage,
-    // iconPath: "static/app.png", does not work when packaged
+    iconPath: path
+      .join(import.meta.dirname, "..", "static", "app-512.png")
+      .replace(/app\.asar(?=[/\\])/, "app.asar.unpacked"),
     copyright: pkg?.license,
   });
   // This method will be called when Electron has finished
