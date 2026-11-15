@@ -26,6 +26,13 @@ import { JsonConfig } from "./json-config.mjs";
 import { defaultKeys } from "./keys.mjs";
 import { Dbus } from "./dbus.mjs";
 
+// error when stdout is piped + ctrl-c
+for (const stream of [process.stdout, process.stderr]) {
+  stream?.on("error", (err) => {
+    if (err.code !== "EPIPE") throw err;
+  });
+}
+
 const defaultUserAgent =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36";
 
