@@ -5,6 +5,8 @@
 // Otherwise (AppImage, dev, ...) the entry is generated
 //
 // Not supported in a snap: the home plug can't write to the real ~/.config.
+// Not supported in a flatpak either: no access to ~/.config/autostart (would
+// need the org.freedesktop.portal.Background portal).
 
 import { app } from "electron";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -12,13 +14,9 @@ import os from "node:os";
 import path from "node:path";
 import { consola } from "consola";
 
-import pkg from "../package.json" with { type: "json" };
-// also used by electron-builder.yml
-import linuxDesktop from "./linux-desktop.json" with { type: "json" };
+import { desktopEntry, desktopName } from "./desktop-entry.mjs";
 
-export const autostartSupported = !process.env.SNAP;
-
-const desktopName = pkg.desktopName ?? "elecwhat.desktop";
+export const autostartSupported = !process.env.SNAP && !process.env.FLATPAK_ID;
 
 function autostartFilePath() {
   const configHome = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), ".config");
@@ -74,35 +72,9 @@ function execCommand() {
   return exec;
 }
 
-// https://specifications.freedesktop.org/desktop-entry-spec/latest/value-types.html
-function desktopStringEscape(value) {
-  return value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
-}
-
-// Same entry as electron-builder's (LinuxTargetHelper.computeDesktopEntry in
-// app-builder-lib), from the same src/linux-desktop.json, minus the Exec field
-// codes.
+// The entry electron-builder installs, minus the Exec field codes
 function generatedEntry() {
-  const { category, mimeTypes = [], desktop } = linuxDesktop.linux;
-  const executableName = pkg.name;
-  const entry = {
-    Name: desktopStringEscape(pkg.productName ?? pkg.name),
-    Exec: execCommand(),
-    Terminal: "false",
-    Type: "Application",
-    Icon: executableName,
-    StartupWMClass: desktopStringEscape(desktopName.replace(/\.desktop$/, "")),
-    ...desktop?.entry,
-  };
-  if (pkg.description) {
-    entry.Comment = desktopStringEscape(pkg.description);
-  }
-  if (mimeTypes.length) {
-    entry.MimeType = mimeTypes.join(";") + ";";
-  }
-  entry.Categories = category.endsWith(";") ? category : category + ";";
-  entry["X-GNOME-Autostart-enabled"] = "true";
-  return ["[Desktop Entry]", ...Object.entries(entry).map(([key, value]) => `${key}=${value}`), ""].join("\n");
+  return desktopEntry({ exec: execCommand(), extra: { "X-GNOME-Autostart-enabled": "true" } });
 }
 
 // Copy of an installed entry: drop the Exec field codes (%U...), there is

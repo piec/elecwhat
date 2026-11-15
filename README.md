@@ -19,6 +19,7 @@
 * Preserve window position
 * Custom user scripts in `~/.config/elecwhat/user-scripts/*.js`
 * Custom tray icons in `~/.config/elecwhat/user-icons/*.png` by default
+* Supports Wayland or X11
 
 ## Why?
 I created this client after due to recurrent stability issues with other linux clients.

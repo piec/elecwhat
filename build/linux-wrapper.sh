@@ -10,6 +10,8 @@
 #   ActivationToken signal)
 # - in a snap, libnotify sends notifications through the xdg-desktop-portal,
 #   which doesn't give one back either
+# - same in a flatpak (gnome-shell isn't reachable from the sandbox to check
+#   its version anyway)
 # The ozone platform can't be changed from JS (too late), hence this wrapper.
 # Passing --ozone-platform=... explicitly disables the detection.
 
@@ -27,6 +29,9 @@ case " $* " in
     if [ -n "$SNAP" ]; then
       force_x11 "snap"
       set -- --ozone-platform=x11 "$@"
+    elif [ -n "$FLATPAK_ID" ]; then
+      force_x11 "flatpak"
+      set -- --ozone-platform=x11 "$@"
     else
       case "$XDG_CURRENT_DESKTOP" in
       *GNOME* | *gnome*)
@@ -41,5 +46,17 @@ case " $* " in
   fi
   ;;
 esac
+
+if [ -n "$FLATPAK_ID" ]; then
+  # Chromium hands the tray icon to the StatusNotifierWatcher as a png in a temp dir
+  if [ -n "$XDG_RUNTIME_DIR" ]; then
+    export TMPDIR="$XDG_RUNTIME_DIR/app/$FLATPAK_ID"
+  fi
+  # zypak (from org.electronjs.Electron2.BaseApp) makes chromium's sandbox
+  # work inside the flatpak one
+  if command -v zypak-wrapper >/dev/null 2>&1; then
+    exec zypak-wrapper "$bin" "$@"
+  fi
+fi
 
 exec "$bin" "$@"
