@@ -16,6 +16,7 @@ import {
   convertWhatsAppUrl,
   urlScheme,
   defaultQuitOnClose,
+  versionInfo,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -48,10 +49,7 @@ function handleWhatsAppProtocol(window, url) {
 }
 
 function main() {
-  consola.info("electron", process.versions.electron);
-  // electron always sets this switch on linux, to the platform actually in use
-  const ozonePlatform = app.commandLine.getSwitchValue("ozone-platform");
-  consola.info("ozone platform", ozonePlatform);
+  consola.info(pkg.name, versionInfo());
   const config = new JsonConfig(path.join(app.getPath("userData"), "config.json"));
 
   // Configure log level: CLI option takes priority over config option
@@ -414,7 +412,7 @@ function main() {
 
   app.setAboutPanelOptions({
     applicationName: pkg.name,
-    applicationVersion: `${app.getVersion()} (electronjs ${process.versions.electron}${ozonePlatform ? `, ${ozonePlatform}` : ""})`,
+    applicationVersion: versionInfo(),
     authors: [pkg?.author?.name],
     website: pkg?.homepage,
     iconPath: path

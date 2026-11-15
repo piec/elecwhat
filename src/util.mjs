@@ -21,6 +21,24 @@ export const isDebug = process?.env?.DEBUG == 1;
 // so hiding to tray on close would leave the app with no way to reopen it.
 export const defaultQuitOnClose = (process?.env?.XDG_CURRENT_DESKTOP ?? "").toLowerCase().includes("gnome");
 
+// How the app was installed, as far as we can tell from the environment
+export const packaging = process.env.SNAP
+  ? "snap"
+  : process.env.FLATPAK_ID
+    ? "flatpak"
+    : process.env.APPIMAGE
+      ? "appimage"
+      : app.isPackaged
+        ? "packaged"
+        : "dev";
+
+// "1.2.3 (electronjs 39.0.0, wayland, flatpak)"
+export function versionInfo() {
+  const ozonePlatform = app.commandLine.getSwitchValue("ozone-platform");
+  const details = [`electronjs ${process.versions.electron}`, ozonePlatform, packaging].filter(Boolean);
+  return `${app.getVersion()} (${details.join(", ")})`;
+}
+
 export const addAboutMenuItem = () => {
   let menu = Menu.getApplicationMenu();
   if (menu == null || menu.items.length == 0) {
