@@ -411,7 +411,7 @@ function main() {
   };
 
   app.setAboutPanelOptions({
-    applicationName: pkg.name,
+    applicationName: "ElecWhat",
     applicationVersion: versionInfo(),
     authors: [pkg?.author?.name],
     website: pkg?.homepage,
