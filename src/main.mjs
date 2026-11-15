@@ -51,7 +51,7 @@ function main() {
   const logLevelStr = cliLogLevel || configLogLevel;
   consola.level = LogLevels[logLevelStr] ?? 3;
 
-  consola.debug("env", process.env);
+  consola.trace("env", process.env);
   consola.info("config file", config.file);
 
   const persistStateFileName = path.join(app.getPath("userData"), "persistent-state.json");
