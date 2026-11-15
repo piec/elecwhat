@@ -10,5 +10,6 @@
   "show_hide": "Anzeigen / Ausblenden",
   "reload": "Neu laden",
   "quit_on_close": "Beim Schließen beenden",
+  "autostart": "Bei Anmeldung starten",
   "quit": "Beenden"
 }

@@ -25,6 +25,7 @@ import pkg from "../package.json" with { type: "json" };
 import { JsonConfig } from "./json-config.mjs";
 import { defaultKeys } from "./keys.mjs";
 import { Dbus } from "./dbus.mjs";
+import { autostartSupported, isAutostartEnabled, setAutostart, refreshAutostart } from "./autostart.mjs";
 
 // error when stdout is piped + ctrl-c
 for (const stream of [process.stdout, process.stderr]) {
@@ -232,6 +233,10 @@ function main() {
         toggleVisibility(mainWindow);
       });
 
+      if (config.get("refresh-autostart", true)) {
+        refreshAutostart();
+      }
+
       const trayIcon = getUserIcon("app", state) || path.join(import.meta.dirname, "..", "static", "app.png");
       const tray = new Tray(trayIcon);
       const trayContextMenu = Menu.buildFromTemplate([
@@ -258,6 +263,17 @@ function main() {
           click: (menuItem) => {
             config.set("quit-on-close", menuItem.checked);
             // Linux tray icons don't always redraw a toggled checkbox on their own.
+            tray.setContextMenu(trayContextMenu);
+          },
+        },
+        {
+          label: translations?.autostart ?? "Start on login",
+          type: "checkbox",
+          enabled: autostartSupported,
+          checked: isAutostartEnabled(),
+          click: (menuItem) => {
+            setAutostart(menuItem.checked);
+            menuItem.checked = isAutostartEnabled();
             tray.setContextMenu(trayContextMenu);
           },
         },

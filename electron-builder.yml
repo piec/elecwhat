@@ -1,5 +1,14 @@
 appId: "fr.carru.elecwhat"
 
+# .desktop entry settings (linux.category, linux.mimeTypes, linux.desktop.entry),
+# deep-merged into this config. Kept in a separate file so that
+# src/autostart.mjs generates the same entry at runtime:
+# - category and mimeTypes: register the "whatsapp:" url scheme
+# - SingleMainWindow: prevents GNOME Shell's "New Window" context menu item
+# - Comment is always set from package.json's description, an entry Comment
+#   would be ignored
+extends: src/linux-desktop.json
+
 # Without an explicit allowlist, electron-builder packs the whole project
 # root into app.asar by default — including dotfiles like .vscode/ and
 # .claude/, and any stray untracked files that happen to be sitting there
@@ -40,19 +49,8 @@ linux:
     - tar.xz
 
     # - flatpak
-  category: "Network;Chat;InstantMessaging;X-WhatsApp;"
-  desktop:
-    entry:
-      Name: ElecWhat
-      GenericName: WhatsApp Client
-      Comment: Simple WhatsApp client
-      # Prevent GNOME Shell context menu "New Window"
-      SingleMainWindow: "true"
-
-
-  # Register "whatsapp:" url scheme
-  mimeTypes:
-    - x-scheme-handler/whatsapp
+  # category, mimeTypes and desktop.entry are in src/linux-desktop.json (see
+  # extends above)
 
 # AppArmor profile (Ubuntu 24+) must attach to elecwhat.bin, not to the wrapper script.
 deb:

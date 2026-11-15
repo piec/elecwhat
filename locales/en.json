@@ -2,5 +2,6 @@
   "show_hide": "Show/Hide",
   "reload": "Reload",
   "quit_on_close": "Quit on close",
+  "autostart": "Start on login",
   "quit": "Quit"
 }

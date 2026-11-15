@@ -1,5 +1,4 @@
 import { Menu, MenuItem, app, nativeImage, net } from "electron";
-import { JsonConfig } from "./json-config.mjs";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { consola } from "consola";

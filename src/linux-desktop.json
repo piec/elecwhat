@@ -1,0 +1,13 @@
+{
+  "linux": {
+    "category": "Network;Chat;InstantMessaging;X-WhatsApp;",
+    "mimeTypes": ["x-scheme-handler/whatsapp"],
+    "desktop": {
+      "entry": {
+        "Name": "ElecWhat",
+        "GenericName": "WhatsApp Client",
+        "SingleMainWindow": "true"
+      }
+    }
+  }
+}
