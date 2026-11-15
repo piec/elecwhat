@@ -279,6 +279,13 @@ function main() {
         },
         { type: "separator" },
         {
+          label: translations?.about ?? "About",
+          type: "normal",
+          click: () => {
+            app.showAboutPanel();
+          },
+        },
+        {
           label: translations?.quit ?? "Quit",
           type: "normal",
           click: () => {

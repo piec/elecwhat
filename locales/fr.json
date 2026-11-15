@@ -11,5 +11,6 @@
   "reload": "Recharger",
   "quit_on_close": "Quitter à la fermeture",
   "autostart": "Lancer à l'ouverture de session",
+  "about": "À propos",
   "quit": "Quitter"
 }

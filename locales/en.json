@@ -3,5 +3,6 @@
   "reload": "Reload",
   "quit_on_close": "Quit on close",
   "autostart": "Start on login",
+  "about": "About",
   "quit": "Quit"
 }
