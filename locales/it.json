@@ -8,6 +8,7 @@
   "saveVideoAs": "Salva video come...",
   "inspect": "Ispeziona elemento",
   "show_hide": "Mostra / Nascondi",
+  "reload": "Ricarica",
   "quit_on_close": "Esci alla chiusura",
   "quit": "Chiudi"
 }

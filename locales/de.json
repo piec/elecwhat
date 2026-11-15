@@ -8,6 +8,7 @@
   "copyLink": "Link kopieren",
   "inspect": "Element untersuchen",
   "show_hide": "Anzeigen / Ausblenden",
+  "reload": "Neu laden",
   "quit_on_close": "Beim Schließen beenden",
   "quit": "Beenden"
 }

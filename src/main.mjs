@@ -236,6 +236,15 @@ function main() {
           },
         },
         {
+          label: translations?.reload ?? "Reload",
+          type: "normal",
+          click: () => {
+            consola.debug("reload");
+            mainWindow?.reload();
+          },
+        },
+        { type: "separator" },
+        {
           label: translations?.quit_on_close ?? "Quit on close",
           type: "checkbox",
           checked: config.get("quit-on-close", defaultQuitOnClose),
