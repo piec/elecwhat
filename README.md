@@ -14,7 +14,7 @@
 * Dock unread count badge
 * Very stable, I have been running it for 1+ year without crash/freeze
 * Can be trusted:
-  * Code easy to review - ~800 lines of code currently
+  * Code easy to review - ~1200 lines of code currently in src*
   * Automatically built by GitHub Actions (CI)
 * Preserve window position
 * Custom user scripts in `~/.config/elecwhat/user-scripts/*.js`
