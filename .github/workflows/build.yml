@@ -63,21 +63,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      # Repackages dist/linux-unpacked (left by the build above), see
-      # flatpak/fr.carru.elecwhat.yml
-      - name: Build flatpak
+      # Repackages dist/linux-unpacked from the electron-builder step above and
+      # uploads it to the (draft) release it created
+      - name: Flatpak
         run: |
-          sudo apt install -y flatpak flatpak-builder
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
           flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           ./build-flatpak.sh --skip-electron-builder
+          gh release upload "$GITHUB_REF_NAME" dist/*.flatpak --clobber
         env:
           # no FUSE on the runners
           FLATPAK_BUILDER_ARGS: --disable-rofiles-fuse
-
-      # electron-builder created the (draft) release above
-      - name: Upload flatpak to the release
-        run: gh release upload "$GITHUB_REF_NAME" dist/*.flatpak --clobber
-        env:
           GH_TOKEN: ${{ github.token }}
 
       - name: Print SHA256 digests of built files
