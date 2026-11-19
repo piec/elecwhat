@@ -67,6 +67,8 @@ Also I just wanted a simple and stable client and thought it could be done witho
   "menu-bar": true,
   "menu-bar-auto-hide": true,
 
+  "autostart": false,
+
   "keys": {
     "C ArrowDown": {
       "whatsappAction": "GO_TO_NEXT_CHAT"
