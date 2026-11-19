@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@homebridge/dbus-native": "^0.7.2",
+    "byte-size": "^9.0.2",
     "consola": "^3.4.2",
     "electron-context-menu": "^5.1.0",
     "jsonc-parser": "^3.3.1",

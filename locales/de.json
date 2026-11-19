@@ -12,5 +12,12 @@
   "quit_on_close": "Beim Schließen beenden",
   "autostart": "Bei Anmeldung starten",
   "about": "Über",
+  "clear_cache_menu": "Cache leeren…",
+  "clear_cache": "Cache leeren",
+  "clear_cache_ok": "Cache leeren",
+  "cancel": "Abbrechen",
+  "clear_cache_message": "Cache leeren ({size})?",
+  "clear_cache_detail": "Zwischengespeicherte Bilder und Videos werden bei Bedarf erneut heruntergeladen. Sie bleiben angemeldet und Ihre Chats sind nicht betroffen.",
+  "clear_cache_done": "Cache geleert, {size} freigegeben",
   "quit": "Beenden"
 }

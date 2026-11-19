@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { consola } from "consola";
 import sharp from "sharp";
+import byteSize from "byte-size";
 
 export const toggleVisibility = function (window) {
   consola.debug("toggleVisibility");
@@ -191,4 +192,8 @@ export function convertWhatsAppUrl(url) {
     consola.error("Failed to convert whatsapp URL:", url, err);
     return null;
   }
+}
+
+export function formatSize(bytes) {
+  return byteSize(bytes, { units: "iec" }).toString();
 }

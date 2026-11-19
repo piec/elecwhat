@@ -12,5 +12,12 @@
   "quit_on_close": "Esci alla chiusura",
   "autostart": "Avvia all'accesso",
   "about": "Informazioni",
+  "clear_cache_menu": "Svuota cache…",
+  "clear_cache": "Svuota cache",
+  "clear_cache_ok": "Svuota cache",
+  "cancel": "Annulla",
+  "clear_cache_message": "Svuotare la cache ({size})?",
+  "clear_cache_detail": "Le immagini e i video in cache verranno scaricati di nuovo quando necessario. Resterai connesso e le tue chat non saranno toccate.",
+  "clear_cache_done": "Cache svuotata, {size} liberati",
   "quit": "Chiudi"
 }

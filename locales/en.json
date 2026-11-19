@@ -4,5 +4,12 @@
   "quit_on_close": "Quit on close",
   "autostart": "Start on login",
   "about": "About",
+  "clear_cache_menu": "Clear cache…",
+  "clear_cache": "Clear cache",
+  "clear_cache_ok": "Clear cache",
+  "cancel": "Cancel",
+  "clear_cache_message": "Clear the cache ({size})?",
+  "clear_cache_detail": "Cached images and videos will be downloaded again when needed. You will stay logged in and your chats are not affected.",
+  "clear_cache_done": "Cache cleared, {size} freed",
   "quit": "Quit"
 }

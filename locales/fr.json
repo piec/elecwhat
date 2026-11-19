@@ -12,5 +12,12 @@
   "quit_on_close": "Quitter à la fermeture",
   "autostart": "Lancer à l'ouverture de session",
   "about": "À propos",
+  "clear_cache_menu": "Vider le cache…",
+  "clear_cache": "Vider le cache",
+  "clear_cache_ok": "Vider le cache",
+  "cancel": "Annuler",
+  "clear_cache_message": "Vider le cache ({size}) ?",
+  "clear_cache_detail": "Les images et vidéos en cache seront téléchargées de nouveau si besoin. Vous restez connecté et vos discussions ne sont pas affectées.",
+  "clear_cache_done": "Cache vidé, {size} libérés",
   "quit": "Quitter"
 }

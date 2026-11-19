@@ -17,6 +17,7 @@ import {
   urlScheme,
   defaultQuitOnClose,
   versionInfo,
+  formatSize,
 } from "./util.mjs";
 import contextMenu from "electron-context-menu";
 import { debounce } from "lodash-es";
@@ -46,6 +47,46 @@ function handleWhatsAppProtocol(window, url) {
     // is there a way to pass it to the webapp without reloading?
     window.webContents.loadURL(webUrl);
   }
+}
+
+async function clearCache(window, translations) {
+  const ses = window.webContents.session;
+  const sizeBefore = await ses.getCacheSize();
+  const { response } = await dialog.showMessageBox(window, {
+    type: "question",
+    buttons: [translations?.clear_cache_ok ?? "Clear cache", translations?.cancel ?? "Cancel"],
+    defaultId: 0,
+    cancelId: 1,
+    title: translations?.clear_cache ?? "Clear cache",
+    message: (translations?.clear_cache_message ?? "Clear the cache ({size})?").replace(
+      "{size}",
+      formatSize(sizeBefore),
+    ),
+    detail:
+      translations?.clear_cache_detail ??
+      "Cached images and videos will be downloaded again when needed. You will stay logged in and your chats are not affected.",
+  });
+  if (response !== 0) {
+    return;
+  }
+  consola.info("clear cache, size before", formatSize(sizeBefore));
+  try {
+    await ses.clearCache();
+    await ses.clearCodeCaches({});
+    await ses.clearStorageData({ storages: ["cachestorage", "shadercache"] });
+  } catch (err) {
+    consola.error("clear cache", err);
+  }
+  const sizeAfter = await ses.getCacheSize();
+  consola.info("clear cache, size after", formatSize(sizeAfter));
+  new Notification({
+    title: pkg.name,
+    body: (translations?.clear_cache_done ?? "Cache cleared, {size} freed").replace(
+      "{size}",
+      formatSize(Math.max(0, sizeBefore - sizeAfter)),
+    ),
+  }).show();
+  window.reload();
 }
 
 function main() {
@@ -251,6 +292,14 @@ function main() {
           click: () => {
             consola.debug("reload");
             mainWindow?.reload();
+          },
+        },
+        {
+          label: translations?.clear_cache_menu ?? "Clear cache…",
+          type: "normal",
+          click: () => {
+            windowShow(mainWindow);
+            clearCache(mainWindow, translations);
           },
         },
         { type: "separator" },

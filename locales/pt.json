@@ -12,5 +12,12 @@
   "quit_on_close": "Sair ao fechar",
   "autostart": "Iniciar ao entrar na sessão",
   "about": "Sobre",
+  "clear_cache_menu": "Limpar cache…",
+  "clear_cache": "Limpar cache",
+  "clear_cache_ok": "Limpar cache",
+  "cancel": "Cancelar",
+  "clear_cache_message": "Limpar o cache ({size})?",
+  "clear_cache_detail": "As imagens e vídeos em cache serão baixados novamente quando necessário. Você continuará conectado e suas conversas não serão afetadas.",
+  "clear_cache_done": "Cache limpo, {size} liberados",
   "quit": "Sair"
 }
